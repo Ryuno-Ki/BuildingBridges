@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Building Bridges</title>
+    <style>
+      body {
+        color: black;
+	background-color: white;
+      }
+
+      #left-pane {
+        float: left;
+        width: 15em;
+      }
+
+      #bridge {
+        border: 1px solid black;
+      }
+
+      #right-pane {
+        width: 80%;
+        float: right;
+      }
+
+      #right-pane ul {
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Brücken schlagen</h1>
+    <div id='left-pane'>
+      <canvas id="bridge" width="200" height="200">
+        Please upgrade your browser in order to use canvas objects!
+      </canvas>
+    </div>
+    <div id='right-pane'>
+      <p>
+        <select>
+          <option>Gelenk</option>
+          <option>Lager</option>
+          <option>Stange</option>
+        </select>
+        <label for="gelenk-x">Gelenk x</label>
+        <input id="gelenk-x" type="number" />
+        <label for="gelenk-y">Gelenk y</label>
+        <input id="gelenk-y" type="number" />
+        <button type="button" id="add-gelenk">Hinzufügen</button>
+      </p>
+      <h2>Gespeicherte Werte</h2>
+      <ul id="gelenke">
+      </ul>
+      <ul id="staebe">
+      </ul>
+    </div>
+    <script src="bridges.js"></script>
+  </body>
+</html>
