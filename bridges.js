@@ -1,169 +1,242 @@
 // FIXME:
-// - check boundaries of canvas before pushing new gelenk to bridge
 // - cleanup properties and methods (namespace!)
 // - only fire DOM-related elements when ready
 // - separate logic from presentation (= DOM)
 // - calculate stange automatically (?, looking in neighborhood)
-// - handle relationships
+// - move getPosition out of the binding to gElX/gElY in order for drawing Lager
+// - http://jsfiddle.net/ajTkP/13/
 //
-// Gelenk = Kinematic pair
-// Lager = bearing
-// Stab = rod
+// Flow:
+//  1. Ask for Lager position and fill rects to the nearest border
+//  2. Ask for Gelenk position and add the circles
+//  3. Ask for Stab ends by clicking the respective elements in list
+//  Make all of above steps editable
 
-Object.prototype.extend = function(newProperties) {
-  for (var propertyName in newProperties) {
-    this[propertyName] = newProperties[propertyName];
-  }
-  return this;
-};
-
-var Bridge = {
-  gelenke: new Array(),
-  stab:    new Array(),
-  lager:   new Array(),
-  addGelenk: function(g) {
-    console.log('Adding ' + g.name + '(' + g.x() + ', ' + g.y() + ') as '
-      + (this.gelenke.length+1) + '. element.');
-    this.gelenke.push(g);
-  }
-};
-
-var Gelenk = {
-  name: 'Gelenk',
-  _x:   null,
-  _y:   null,
-  init: function(name, x,y) {
-    console.log('Create new ' + name + ' with (' + x + ', ' + y + ').');
-    this.name = name;
-    this._x = x;
-    this._y = y;
-  },
-  x:       function()     { return this._x; },
-  y:       function()     { return this._y; },
-  setX:    function(x)    { this._x = x; },
-  setY:    function(y)    { this._y = y; },
-};
-
-var Stab = {
-  name:      'Stab',
-  leftEnd:   undefined,
-  rightEnd:  undefined,
-  _length:   null,
-  length:    function()       { return this._length; },
-  setLength: function(length) { this._length = length; }
-};
-
-var Lager = Object.create(Gelenk).extend( {
-  name:    'Lager',
-  _mass:   null,
-  mass:    function()    { return this._mass; },
-  setMass: function(mass){ this._mass = mass; } 
-});
-
+var b = new Bridge();
 document.addEventListener('DOMContentLoaded', init, false);
+
+// FIXME: Put into Bridge namespace
 function init() {
-  var gelenkBtn = document.getElementById('add-gelenk');
-  var bridgeEl  = document.getElementById('bridge');
-  var gelenkeEl = document.getElementById('gelenke');
-  gelenkBtn.addEventListener('click', addCoordinates, false);
-  bridgeEl.addEventListener('mousedown', getPosition, false);
-  gelenkeEl.addEventListener('click', buildBridge, false);
+	//var gelenkBtn = document.getElementById('add-gelenk');
+	var canvas         = document.getElementById('bridge');
+	var coords         = document.getElementById('coords');
+	var coordsBtn      = document.getElementById('submit-coords');
+	var gelenkeEl      = document.getElementById('gelenke');
+	var isMobileDevice = navigator.userAgent.match(/ipad|iphone|ipod|android/i);
+	if (isMobileDevice) {
+		gelenkBtn.addEventListener('mousedown', addCoordinates, false);
+		canvas.addEventListener('mousedown', getPosition, false);
+	} else {
+		//gelenkBtn.addEventListener('click',     addCoordinates, false);
+		canvas.addEventListener('click', function(e) {
+			pnt = getPosition(e);
+			updateCanvas(pnt.x, pnt.y);
+		}, false);
+		coords.addEventListener('keyup', function() {
+			x = document.getElementById('x-coord').value;
+			y = document.getElementById('y-coord').value;
+			updateCanvas(x, y);
+		}, false);
+	};
+	// Both
+	coordsBtn.addEventListener('click', function() {
+		x    = document.getElementById('x-coord').value;
+		y    = document.getElementById('y-coord').value;
+		type = document.getElementById('type').value;
+		if (type == 'lager') {
+			l = new Lager();
+			if (b.lager.length >= 0 && b.lager.length < 2) {
+				l.setX(x);
+				l.setY(y);
+				b.addToList(l);
+				printCoordinates(b,x,y);
+			}
+		} else {
+			g = new Gelenk();
+			if (b.gelenke.length >= 0) {
+				g.setX(x);
+				g.setY(y);
+				b.addToList(g);
+			}
+		}
+		updateCanvas();
+	}, false);
+	//gelenkBtn.addEventListener('submit',    addCoordinates, false);
+	gelenkeEl.addEventListener('click', buildBridge, false);
 };
 
-function addCoordinates() {
-  gX = document.getElementById('gelenk-x').value;
-  gY = document.getElementById('gelenk-y').value;
-  b = Object.create(Bridge);
-  g = Object.create(Gelenk);
-  g.setX(gX);
-  g.setY(gY);
-  b.addGelenk(g);
-  printCoordinates(b, gX,gY);
-};
+function updateCanvas(x,y) {
+	clearCanvas();
+	var canvas       = document.getElementById('bridge');
+	var xCoord       = document.getElementById('x-coord');
+	var yCoord       = document.getElementById('y-coord');
+	if (x != "" && y != "") {
+		showCircle(x,y);
+		xCoord.value = x;
+		yCoord.value = y;
+	}
+	if (b.lager.length) {
+		for (var l = 0; l < b.lager.length; ++l) {
+			var current      = b.lager[l];
+			var currentX     = current.getX();
+			var currentY     = current.getY();
+			var distToLeft   = currentX - 0;
+			var distToRight  = canvas.width - currentX;
+			var distToBottom = canvas.height - currentY;
+			if (current.getPos() == 'left') {
+				drawRect(0, currentY, distToLeft, distToBottom);
+			} else {
+				drawRect(currentX, currentY, distToRight, distToBottom);
+			}
+			annotate('Lager ' + l, current);
+			drawLine(0, currentY, canvas.width, currentY, true);
+			drawLine(currentX, 0, currentX, canvas.height, true);
+		}
+		if (b.lager.length == 2) {
+			updateInputField();
+		}
+	}
+	if (b.gelenke.length) {
+		for (var g = 0; g < b.gelenke.length; ++g) {
+			var current = b.gelenke[g];
+			drawCircle(current.getX(), current.getY());
+		}
+	}
+	if (b.stab.length) {
+		for (var s = 0; s < b.stab.length; ++s) {
+			var current = b.stab[s];
+			var left    = b.lager[current.left];
+			var right   = b.gelenke[current.right];
+			drawLine(left.getX(), left.getY(), right.getX(), right.getX());
+		}
+	}
+}
+
+function updateInputField() {
+	var step   = document.getElementById('step');
+	var type   = document.getElementById('type');
+	var coords = document.getElementById('coords');
+	step.innerHTML = 'Schritt 2: Gelenke festlegen';
+	if (type.value == 'lager') {
+		type.value     = 'gelenk';
+		var stabBtn = document.createElement("button");
+		stabBtn.appendChild(document.createTextNode('Stab erstellen'));
+		stabBtn.type  = 'button';
+		stabBtn.id    = 'save-lager';
+		coords.appendChild(stabBtn);
+		stabBtn.addEventListener('click', buildDistanceMatrix, false);
+	}
+}
 
 function printCoordinates(b, x,y) {
-  gelenke = document.getElementById('gelenke');
-  var gItem = document.createElement('li');
-  var gPair = b.gelenke[b.gelenke.length-1].name +
-        '(' + b.gelenke[b.gelenke.length-1].x() + ', '
-            + b.gelenke[b.gelenke.length-1].y() + ')';
+	var lager  = document.getElementById('lager');
+  if (b.lager.length) {
+		for (var l = 0; l < b.lager.length; ++l) {
+			// FIXME: First entry twice
+			var option  = document.createElement('option');
+			option.text = b.lager[l].getPos();
+			option.value = 'holder';
+			lager.appendChild(option);
+		};
+	}
+
+	/*
+  var gelenke = document.getElementById('gelenke');
+  var gItem   = document.createElement('li');
+  var gPair   = b.gelenke[b.gelenke.length-1].name +
+          '(' + b.gelenke[b.gelenke.length-1].getX() + ', '
+              + b.gelenke[b.gelenke.length-1].getY() + ')';
   gItem.appendChild(document.createTextNode(gPair));
   gelenke.appendChild(gItem);
 
-  buildBridge();
-  staebe  = document.getElementById('staebe');
-  var sItem = document.createElement('li');
-  console.log(b.stab[b.stab-length-1]);
-  var sPair = b.stab[b.stab.length-1].name +
-        '(' + b.stab[b.stab.length-1].leftEnd + ', '
-	    + b.stab[b.stab.length-1].rightEnd + ') = '
-	    + b.stab[b.stab.length-1].length();
+  buildBridge(b);
+  var sEl    = document.getElementById('staebe');
+  var sItem  = document.createElement('li');
+	console.log(b.stab);
+  var sPair  = b.stab[b.stab.length-1].name + ', '
+        +'(' + b.stab[b.stab.length-1].leftEnd + ', '
+             + b.stab[b.stab.length-1].rightEnd + ') = '
+						 + b.stab[b.stab.length-1].getDistance().toFixed(3);
   sItem.appendChild(document.createTextNode(sPair));
-  staebe.appendChild(sItem);
+  sEl.appendChild(sItem);
+	*/
 };
 
 function getPosition(event) {
-  var bridge = document.getElementById('bridge');
-  var gelenkX = document.getElementById('gelenk-x');
-  var gelenkY = document.getElementById('gelenk-y');
-  var x = new Number();
-  var y = new Number();
-  var b = Object.create(Bridge);
-  var g = Object.create(Gelenk);
+	var canvas = document.getElementById('bridge');
+	var x      = new Number();
+	var y      = new Number();
 
-  if (event.x != undefined && event.y != undefined) {
-    x = event.x;
-    y = event.y;
-  } else { // Firefox hack?
-    x = event.clientX + document.body.scrollLeft
-	              + document.documentElement.scrollLeft;
-    y = event.clientY + document.body.scrollTop
-	              + document.documentElement.scrollTop;
-  }
-
-  x -= bridge.offsetLeft;
-  y -= bridge.offsetTop;
-  g.setX(x); g.setY(y);
-  b.addGelenk(g);
-  printCoordinates(b, x,y);
-  drawCircle(x,y,2);
-  gelenkX.value = x;
-  gelenkY.value = y;
-  console.log('x: ' + x + ', y: ' + y);
+	if (event.x != undefined && event.y != undefined) {
+		x = event.x;
+		y = event.y;
+	} else { // Firefox hack?
+		x = event.clientX + document.body.scrollLeft
+		                  + document.documentElement.scrollLeft;
+		y = event.clientY + document.body.scrollTop
+		                  + document.documentElement.scrollTop;
+	}
+	x -= bridge.offsetLeft;
+	y -= bridge.offsetTop;
+	return {
+		x: x,
+		y: y
+	}
 };
 
-function buildBridge() {
-  var gelenke = document.getElementById('gelenke');
-  if (Bridge.gelenke.length > 1) {
-    for (var i = 0; i < Bridge.gelenke.length-1; ++i) {
-      d = getDistance(Bridge.gelenke[i], Bridge.gelenke[i+1]);
+function buildBridge(bridge) {
+  var gEl = document.getElementById('gelenke');
+  if (bridge.gelenke.length > 1) {
+    for (var i = 0; i < bridge.gelenke.length-1; ++i) {
+      d = getDistance(bridge.gelenke[i], bridge.gelenke[i+1]);
       console.log('Distance between item #' + i + ' and #' + (i+1) + ' is '
 		  + d + '.');
-      var stab = Object.create(Stab);
+      var stab = new Stab;
       stab.leftEnd = i;
       stab.rightEnd = i+1;
-      stab.setLength(d);
-      Bridge.stab.push(stab);
+      stab.setDistance(d);
+			console.log(stab);
+      bridge.stab.push(stab);
     };
-    x1 = Bridge.gelenke[Bridge.stab[Bridge.stab.length-1].leftEnd].x();
-    y1 = Bridge.gelenke[Bridge.stab[Bridge.stab.length-1].leftEnd].y();
-    x2 = Bridge.gelenke[Bridge.stab[Bridge.stab.length-1].rightEnd].x();
-    y2 = Bridge.gelenke[Bridge.stab[Bridge.stab.length-1].rightEnd].y();
-    console.log(x1);
-    console.log(y1);
-    console.log(x2);
-    console.log(y2);
+
+    x1 = bridge.gelenke[bridge.stab[bridge.stab.length-1].leftEnd].getX();
+    y1 = bridge.gelenke[bridge.stab[bridge.stab.length-1].leftEnd].getY();
+    x2 = bridge.gelenke[bridge.stab[bridge.stab.length-1].rightEnd].getX();
+    y2 = bridge.gelenke[bridge.stab[bridge.stab.length-1].rightEnd].getY();
     drawLine(x1, y1, x2, y2);
   };
 };
 
 function getDistance(g1, g2) {
-  var x1 = g1.x(), y1 = g1.y();
-  var x2 = g2.x(), y2 = g2.y();
+  var x1 = g1.getX(), y1 = g1.getY();
+  var x2 = g2.getX(), y2 = g2.getY();
   return Math.pow(Math.pow(x1-x2,2) + Math.pow(y1-y2,2) ,1/2);
 };
 
-function drawCircle(x,y,r){
+// Monkeypatch Math.min for accepting arrays
+var standardMin = Math.min;
+Math.min = function() {
+	if(Array.isArray(arguments[0])) {
+		return standardMin.apply(Math, arguments[0]);
+	} else {
+		return standardMin(arguments[0]);
+	}
+};
+
+function showCircle(x,y) {
+	var r = 3;
+  var bridge = document.getElementById('bridge');
+  var drawingContext = bridge.getContext('2d');
+  drawingContext.beginPath();
+  drawingContext.arc(x, y, r, Math.PI*2, 0, true);
+  drawingContext.fillStyle = '#8C8C8C';
+  drawingContext.closePath();
+  
+  drawingContext.stroke();
+}
+
+function drawCircle(x,y) {
+	var r = 3;
   var bridge = document.getElementById('bridge');
   var drawingContext = bridge.getContext('2d');
   drawingContext.beginPath();
@@ -175,12 +248,68 @@ function drawCircle(x,y,r){
   drawingContext.stroke();
 };
 
-function drawLine(x1, y1, x2, y2) {
+function annotate(text, el) {
+	var bridge = document.getElementById('bridge');
+	var drawingContext = bridge.getContext('2d');
+	drawingContext.font = "bold 12px sans-serif";
+	drawingContext.fillText(text, el.getX()+5, el.getY()-5);
+}
+
+function drawLine(x1, y1, x2, y2, dashed) {
   var bridge = document.getElementById('bridge');
   var drawingContext = bridge.getContext('2d');
+	if (!drawingContext.setLineDash) {
+		drawingContext.setLineDash = function () {}
+	}
   drawingContext.beginPath();
+	if (dashed) {
+		drawingContext.setLineDash([10]);
+	}
   drawingContext.moveTo(x1, y1);
   drawingContext.lineTo(x2, y2);
-  drawingContext.closePath();
   drawingContext.stroke();
+	if (dashed) {
+		drawingContext.setLineDash([]);
+	}
 };
+
+function drawRect(x,y,w,h) {
+	var bridge = document.getElementById('bridge');
+	var drawingContext = bridge.getContext('2d');
+	drawingContext.beginPath();
+	drawingContext.rect(x,y,w,h);
+	drawingContext.closePath();
+	drawingContext.fill();
+	drawingContext.stroke();
+}
+
+function clearCanvas() {
+	var bridge = document.getElementById('bridge');
+	var drawingContext = bridge.getContext('2d');
+  drawingContext.clearRect(0, 0, bridge.width, bridge.height);
+}
+
+function buildDistanceMatrix() {
+	for (var i = 0; i < b.lager.length; ++i) {
+		// As per definition, the first two stab are computed with respect to lager
+		// The leftEnd hereby is the index of lager, the rightEnd the index of gelenk
+		var d = computeDistanceRow(b.lager[i]);
+		var s = new Stab();
+		s.leftEnd = i;
+		s.rightEnd = d.ind;
+		s.setDistance(d.min);
+	}
+}
+
+function computeDistanceRow(arr) {
+	var distRow = [];
+	for (var j = 0; j < b.gelenke.length; ++j) {
+		var d = getDistance(arr, b.gelenke[j]);
+		distRow.push(d);
+	}
+	var arrMin = Math.min(distRow);
+	return {
+		min: arrMin,
+		ind: distRow.indexOf(arrMin)
+	}
+}
