@@ -1,0 +1,14 @@
+{
+  "name": "Building Bridges",
+  "description": "A demo",
+  "version": "0.0.1",
+  "launch_path": "/index.html",
+  "icons": {
+    "64": "bridge-128.png"
+  },
+  "developer": {
+    "name": "André Jaenisch",
+    "url": "https://github.com/Ryuno-Ki"
+  },
+  "default_locale": "en"
+}
