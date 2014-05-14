@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', init, false);
 function init() {
 	//var gelenkBtn = document.getElementById('add-gelenk');
 	var canvas         = document.getElementById('bridge');
+	var fileChooser    = document.getElementById('fileChooser');
 	var coords         = document.getElementById('coords');
 	var coordsBtn      = document.getElementById('submit-coords');
 	var gelenkeEl      = document.getElementById('gelenke');
@@ -27,7 +28,6 @@ function init() {
 		gelenkBtn.addEventListener('mousedown', addCoordinates, false);
 		canvas.addEventListener('mousedown', getPosition, false);
 	} else {
-		//gelenkBtn.addEventListener('click',     addCoordinates, false);
 		canvas.addEventListener('click', function(e) {
 			pnt = getPosition(e);
 			updateCanvas(pnt.x, pnt.y);
@@ -39,6 +39,7 @@ function init() {
 		}, false);
 	};
 	// Both
+	fileChooser.addEventListener('change', handleFileSelection, false);
 	coordsBtn.addEventListener('click', function() {
 		x    = document.getElementById('x-coord').value;
 		y    = document.getElementById('y-coord').value;
@@ -49,7 +50,7 @@ function init() {
 				l.setX(x);
 				l.setY(y);
 				b.addToList(l);
-				printCoordinates(b,x,y);
+				printCoordinates();
 			}
 		} else {
 			g = new Gelenk();
@@ -57,6 +58,7 @@ function init() {
 				g.setX(x);
 				g.setY(y);
 				b.addToList(g);
+				printCoordinates();
 			}
 		}
 		updateCanvas();
@@ -89,8 +91,10 @@ function updateCanvas(x,y) {
 				drawRect(currentX, currentY, distToRight, distToBottom);
 			}
 			annotate('Lager ' + l, current);
+			/*
 			drawLine(0, currentY, canvas.width, currentY, true);
 			drawLine(currentX, 0, currentX, canvas.height, true);
+			*/
 		}
 		if (b.lager.length == 2) {
 			updateInputField();
@@ -128,27 +132,30 @@ function updateInputField() {
 	}
 }
 
-function printCoordinates(b, x,y) {
-	var lager  = document.getElementById('lager');
-  if (b.lager.length) {
+function printCoordinates() {
+	var lager   = document.getElementById('lager');
+	var gelenke = document.getElementById('gelenke');
+	if (b.lager.length) {
 		for (var l = 0; l < b.lager.length; ++l) {
 			// FIXME: First entry twice
 			var option  = document.createElement('option');
 			option.text = b.lager[l].getPos();
-			option.value = 'holder';
+			option.value = b.lager[l].getPos();
 			lager.appendChild(option);
 		};
 	}
+	if (b.gelenke.length) {
+		for (var g = 0; g < b.gelenke.length; ++g) {
+			var current = b.gelenke[g];
+			var li      = document.createElement('li');
+			var liText  = current.name + ' x: ' + current.getX() + ', y: ' + current.getY();
+			li.appendChild(document.createTextNode(liText));
+			console.log(li);
+			gelenke.appendChild(li);
+		}
+	}
 
 	/*
-  var gelenke = document.getElementById('gelenke');
-  var gItem   = document.createElement('li');
-  var gPair   = b.gelenke[b.gelenke.length-1].name +
-          '(' + b.gelenke[b.gelenke.length-1].getX() + ', '
-              + b.gelenke[b.gelenke.length-1].getY() + ')';
-  gItem.appendChild(document.createTextNode(gPair));
-  gelenke.appendChild(gItem);
-
   buildBridge(b);
   var sEl    = document.getElementById('staebe');
   var sItem  = document.createElement('li');
@@ -286,7 +293,7 @@ function drawRect(x,y,w,h) {
 function clearCanvas() {
 	var bridge = document.getElementById('bridge');
 	var drawingContext = bridge.getContext('2d');
-  drawingContext.clearRect(0, 0, bridge.width, bridge.height);
+	drawingContext.clearRect(0, 0, bridge.width, bridge.height);
 }
 
 function buildDistanceMatrix() {
@@ -310,6 +317,48 @@ function computeDistanceRow(arr) {
 	var arrMin = Math.min(distRow);
 	return {
 		min: arrMin,
-		ind: distRow.indexOf(arrMin)
+		ind: distRow.indexOf(arrMin),
+		row: distRow
 	}
+}
+
+function parseTextAsXml(text) {
+    var parser = new DOMParser(),
+        xmlDom = parser.parseFromString(text, "text/xml");
+    consumeXml(xmlDom);
+}
+
+function waitForTextReadComplete(reader) {
+    reader.onloadend = function(event) {
+        var text   = event.target.result;
+	var step   = document.getElementById('step');
+	var coords = document.getElementById('coords');
+
+        parseTextAsXml(text);
+	step.style.display   = 'none';
+	coords.style.display = 'none';
+    }
+}
+
+function handleFileSelection() {
+    var file = fileChooser.files[0],
+        reader = new FileReader();
+
+    waitForTextReadComplete(reader);
+    reader.readAsText(file);
+}
+
+function consumeXml(xml) {
+    var bridgeDom = xml.childNodes[0];
+    var lagerDom = bridgeDom.childNodes[0];
+    for (var l = 0; l < bridgeDom.childNodes.length; ++l) {
+	    var liX = bridgeDom.childNodes[l].childNodes[0].getAttribute('x');
+	    var liY = bridgeDom.childNodes[l].childNodes[0].getAttribute('y');
+	    var lager = new Lager();
+	    lager.setX(liX);
+	    lager.setY(liY);
+	    b.addToList(lager);
+    }
+    updateCanvas();
+    printCoordinates();
 }

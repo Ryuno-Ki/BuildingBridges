@@ -9,7 +9,7 @@
 				background-color: white;
       }
 
-			input {
+			input[type='number'] {
 				width: 3rem;
 			}
 
@@ -35,11 +35,12 @@
   <body>
     <h1>Brücken schlagen</h1>
     <div id='left-pane'>
-      <canvas id="bridge" width="320" height="320">
+      <canvas id="bridge" width="300" height="300">
         Please upgrade your browser in order to use canvas objects!
       </canvas>
     </div>
     <div class='right-pane'>
+			<input id="fileChooser" type="file" />
 			<h2 id='step'>Schritt 1: Lager festlegen</h2>
 			<p id='coords'>
 			  <input id="type" type="hidden" value="lager" />
@@ -49,20 +50,6 @@
 				<input id="y-coord" placeholder="1" step="1" min="1" max="320" type="number" required />
 				<button type="button" id="submit-coords">Speichern</button>
 			</p>
-			<!--
-      <p>
-        <select>
-          <option value="gelenk">Gelenk</option>
-          <option value="lager">Lager</option>
-          <option value="stange">Stange</option>
-        </select>
-        <label for="gelenk-x">Gelenk x</label>
-        <input id="gelenk-x" placeholder="1" type="number" />
-        <label for="gelenk-y">Gelenk y</label>
-        <input id="gelenk-y" type="number" />
-        <button type="button" id="add-gelenk">Hinzufügen</button>
-      </p>
-			-->
 		</div>
 		<div class='right-pane'>
       <h2 id='saved-values'>Gespeicherte Werte</h2>

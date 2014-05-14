@@ -62,6 +62,8 @@ Bridge.prototype.addToList = function(g) {
 				this.lager.push(g);
 				break;
 			case "Gelenk":
+				// FIXME: Disable by default, maybe via property 'helpful'?
+				/*
 				for (var l = 0; l < b.lager.length; ++l) {
 					if (y > b.lager[l].getY()) { // measured from top-left corner
 						console.log(g.name + ' below the treshold.');
@@ -76,6 +78,7 @@ Bridge.prototype.addToList = function(g) {
 						return false;
 					}
 				}
+				*/
 				console.log((this.gelenke.length+1) + '. ' + g.name
 													                  + ' at (' + x + ',' + y + ').');
 				this.gelenke.push(g);
