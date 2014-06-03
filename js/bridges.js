@@ -64,7 +64,7 @@ function init() {
 		updateCanvas();
 	}, false);
 	//gelenkBtn.addEventListener('submit',    addCoordinates, false);
-	gelenkeEl.addEventListener('click', buildBridge, false);
+	//gelenkeEl.addEventListener('click', buildBridge, false);
 };
 
 function updateCanvas(x,y) {
@@ -92,6 +92,7 @@ function updateCanvas(x,y) {
 			}
 			annotate('Lager ' + l, current);
 			/*
+			// Adjustment lines to keep values inside the box
 			drawLine(0, currentY, canvas.width, currentY, true);
 			drawLine(currentX, 0, currentX, canvas.height, true);
 			*/
@@ -109,9 +110,11 @@ function updateCanvas(x,y) {
 	if (b.stab.length) {
 		for (var s = 0; s < b.stab.length; ++s) {
 			var current = b.stab[s];
-			var left    = b.lager[current.left];
-			var right   = b.gelenke[current.right];
-			drawLine(left.getX(), left.getY(), right.getX(), right.getX());
+			var left    = b.lager[current.leftEnd];
+			var right   = b.gelenke[current.rightEnd];
+			console.log(left);
+			console.log(right);
+			drawLine(left.getX(), left.getY(), right.getX(), right.getY());
 		}
 	}
 }
@@ -122,51 +125,61 @@ function updateInputField() {
 	var coords = document.getElementById('coords');
 	step.innerHTML = 'Schritt 2: Gelenke festlegen';
 	if (type.value == 'lager') {
-		type.value     = 'gelenk';
-		var stabBtn = document.createElement("button");
-		stabBtn.appendChild(document.createTextNode('Stab erstellen'));
-		stabBtn.type  = 'button';
-		stabBtn.id    = 'save-lager';
-		coords.appendChild(stabBtn);
+		type.value    = 'gelenk';
+		var lLabel    = document.createElement('label');
+		lLabel.for    = 'left';
+		lLabel.appendChild(document.createTextNode('left:'));
+		var l         = document.createElement('input');
+		l.id          = 'left';
+		l.placeholder = '0';
+		l.type        = 'number';
+		l.min         = '0';
+		l.step        = '1';
+		var rLabel    = document.createElement('label');
+		rLabel.for    = 'right'
+		rLabel.appendChild(document.createTextNode('right:'));
+		var r         = document.createElement('input');
+		r.id          = 'right';
+		r.placeholder = '0';
+		r.type        = 'number';
+		r.min         = '0';
+		r.step        = '1';
+		coords.appendChild(lLabel);
+		coords.appendChild(l);
+		coords.appendChild(rLabel);
+		coords.appendChild(r);
+		/*
 		stabBtn.addEventListener('click', buildDistanceMatrix, false);
+		stabBtn.addEventListener('click', buildBridge, false);
+		*/
 	}
 }
+
+function clearList(list) {
+	// TODO: removeEventListener first!
+	while (list.firstChild) { list.removeChild(list.firstChild) };
+};
 
 function printCoordinates() {
 	var lager   = document.getElementById('lager');
 	var gelenke = document.getElementById('gelenke');
-	if (b.lager.length) {
-		for (var l = 0; l < b.lager.length; ++l) {
-			// FIXME: First entry twice
-			var option  = document.createElement('option');
-			option.text = b.lager[l].getPos();
-			option.value = b.lager[l].getPos();
-			lager.appendChild(option);
-		};
+	clearList(lager);
+	clearList(gelenke);
+	for (var l = 0; l < b.lager.length; ++l) {
+		var option  = document.createElement('option');
+		option.text = b.lager[l].getPos();
+		option.value = b.lager[l].getPos();
+		lager.appendChild(option);
+	};
+	for (var g = 0; g < b.gelenke.length; ++g) {
+		var current = b.gelenke[g];
+		var li      = document.createElement('li');
+		var liText  = current.name + ' at (' + current.getX() + ', ' + current.getY() + ')';
+		li.appendChild(document.createTextNode(liText));
+		gelenke.appendChild(li);
+		document.getElementById('left').max  = b.gelenke.length-1;
+		document.getElementById('right').max = b.gelenke.length-1;
 	}
-	if (b.gelenke.length) {
-		for (var g = 0; g < b.gelenke.length; ++g) {
-			var current = b.gelenke[g];
-			var li      = document.createElement('li');
-			var liText  = current.name + ' x: ' + current.getX() + ', y: ' + current.getY();
-			li.appendChild(document.createTextNode(liText));
-			console.log(li);
-			gelenke.appendChild(li);
-		}
-	}
-
-	/*
-  buildBridge(b);
-  var sEl    = document.getElementById('staebe');
-  var sItem  = document.createElement('li');
-	console.log(b.stab);
-  var sPair  = b.stab[b.stab.length-1].name + ', '
-        +'(' + b.stab[b.stab.length-1].leftEnd + ', '
-             + b.stab[b.stab.length-1].rightEnd + ') = '
-						 + b.stab[b.stab.length-1].getDistance().toFixed(3);
-  sItem.appendChild(document.createTextNode(sPair));
-  sEl.appendChild(sItem);
-	*/
 };
 
 function getPosition(event) {
@@ -191,43 +204,10 @@ function getPosition(event) {
 	}
 };
 
-function buildBridge(bridge) {
-  var gEl = document.getElementById('gelenke');
-  if (bridge.gelenke.length > 1) {
-    for (var i = 0; i < bridge.gelenke.length-1; ++i) {
-      d = getDistance(bridge.gelenke[i], bridge.gelenke[i+1]);
-      console.log('Distance between item #' + i + ' and #' + (i+1) + ' is '
-		  + d + '.');
-      var stab = new Stab;
-      stab.leftEnd = i;
-      stab.rightEnd = i+1;
-      stab.setDistance(d);
-			console.log(stab);
-      bridge.stab.push(stab);
-    };
-
-    x1 = bridge.gelenke[bridge.stab[bridge.stab.length-1].leftEnd].getX();
-    y1 = bridge.gelenke[bridge.stab[bridge.stab.length-1].leftEnd].getY();
-    x2 = bridge.gelenke[bridge.stab[bridge.stab.length-1].rightEnd].getX();
-    y2 = bridge.gelenke[bridge.stab[bridge.stab.length-1].rightEnd].getY();
-    drawLine(x1, y1, x2, y2);
-  };
-};
-
 function getDistance(g1, g2) {
   var x1 = g1.getX(), y1 = g1.getY();
   var x2 = g2.getX(), y2 = g2.getY();
   return Math.pow(Math.pow(x1-x2,2) + Math.pow(y1-y2,2) ,1/2);
-};
-
-// Monkeypatch Math.min for accepting arrays
-var standardMin = Math.min;
-Math.min = function() {
-	if(Array.isArray(arguments[0])) {
-		return standardMin.apply(Math, arguments[0]);
-	} else {
-		return standardMin(arguments[0]);
-	}
 };
 
 function showCircle(x,y) {
@@ -263,6 +243,7 @@ function annotate(text, el) {
 }
 
 function drawLine(x1, y1, x2, y2, dashed) {
+	console.log(x1 + ', ' + y1 + ', ' + x2 + ', ' + y2);
   var bridge = document.getElementById('bridge');
   var drawingContext = bridge.getContext('2d');
 	if (!drawingContext.setLineDash) {
@@ -322,39 +303,28 @@ function computeDistanceRow(arr) {
 	}
 }
 
-function parseTextAsXml(text) {
-    var parser = new DOMParser(),
-        xmlDom = parser.parseFromString(text, "text/xml");
-    consumeXml(xmlDom);
-}
-
 function waitForTextReadComplete(reader) {
-    reader.onloadend = function(event) {
-        var text   = event.target.result;
-	var step   = document.getElementById('step');
-	var coords = document.getElementById('coords');
-
-        parseTextAsXml(text);
-	step.style.display   = 'none';
-	coords.style.display = 'none';
-    }
-}
-
-function handleFileSelection() {
-    var file = fileChooser.files[0],
-        reader = new FileReader();
-
-    waitForTextReadComplete(reader);
-    reader.readAsText(file);
+	reader.onloadend = function(event) {
+		var text   = event.target.result;
+		var step   = document.getElementById('step');
+		var coords = document.getElementById('coords');
+		
+		parseTextAsXml(text);
+		// Dismiss the manually input.
+		step.style.display   = 'none';
+		coords.style.display = 'none';
+	}
 }
 
 function consumeXml(xml) {
     var bridgeDom = xml.childNodes[0];
     var lagerDom = bridgeDom.childNodes[0];
+		console.log(xml);
+		console.log(lagerDom.outerHTML);
     for (var l = 0; l < bridgeDom.childNodes.length; ++l) {
 	    var liX = bridgeDom.childNodes[l].childNodes[0].getAttribute('x');
 	    var liY = bridgeDom.childNodes[l].childNodes[0].getAttribute('y');
-	    var lager = new Lager();
+	    var lager = new Gelenk();
 	    lager.setX(liX);
 	    lager.setY(liY);
 	    b.addToList(lager);
