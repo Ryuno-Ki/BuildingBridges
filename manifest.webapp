@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "launch_path": "/index.html",
   "icons": {
-    "64": "/bridge-64.png"
+    "64": "/assets/bridge-64.png"
+    "32": "/assets/bridge-32.png"
   },
   "developer": {
     "name": "André Jaenisch",
