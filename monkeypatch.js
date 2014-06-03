@@ -16,6 +16,17 @@ Matrix.prototype.toString = function() {
         s.push( this.mtx[i].join(",") );
     return s.join("\n");
 }
+
+Matrix.prototype.copy = function() {
+		var c = [];
+		for (var i = 0; i < this.width; i++) {
+			c[i] = [];
+			for (var j = 0; j < this.height; j++) {
+				c[i][j] = this.mtx[i][j];
+			}
+		}
+		return new Matrix(c);
+}
  
 // returns a new matrix
 Matrix.prototype.transpose = function() {
@@ -46,6 +57,60 @@ Matrix.prototype.mult = function(other) {
         }
     }
     return new Matrix(result); 
+}
+
+Matrix.diag = function(diagEl) {
+		if (!Array.isArray(diagEl)) {
+			throw "error: Not an array";
+		}
+
+		var result = new Array(diagEl.length);
+    for (var i = 0; i < diagEl.length; i++) {
+        result[i] = new Array(diagEl.length);
+        for (var j = 0; j < diagEl.length; j++) {
+					result[i][j] = (i == j ? diagEl[i] : 0);
+				}
+		}
+		return new Matrix(result);
+}
+
+Matrix.eyes = function(len) {
+	var eyesEl = new Array(len);
+	for (var i = 0; i < len; i++) {
+		eyesEl[i] = 1;
+	}
+	return new Matrix.diag(eyesEl);
+}
+
+Matrix.prototype.lr = function() {
+	var n = this.width;
+	var l = new Matrix.eyes(n);
+	var r = this.copy();
+
+	for (var i = 0; i < n-1; i++) {
+		for (var k = i+1; k < n; k++) {
+			if (r.mtx[i][i] == 0) {
+				throw "error: Cannot divide through zero at " + i + ", " + i;
+			}
+			l.mtx[k][i] = r.mtx[k][i] / r.mtx[i][i];
+			for (var j = i; j < n; j++) {
+				r.mtx[k][j] = r.mtx[k][j] - l.mtx[k][i]*r.mtx[i][j];
+			}
+		}
+	}
+	return {
+		l: l,
+		r: r
+	}
+}
+
+Matrix.prototype.det = function() {
+	var r   = this.lr().r;
+	var det = 1;
+	for (var i = 0; i < this.width; i++) {
+		det *= r.mtx[i][i];
+	}
+	return det;
 }
  
 // Monkeypatch Math.min for accepting arrays
