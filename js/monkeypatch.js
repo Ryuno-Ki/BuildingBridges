@@ -7,13 +7,21 @@
 function Matrix(ary) {
     this.mtx    = ary
     this.height = ary.length;
-    this.width  = ary[0].length;
+    this.width  = Array.isArray(ary[0]) ? ary[0].length : 1;
 }
  
 Matrix.prototype.toString = function() {
     var s = []
-    for (var i = 0; i < this.mtx.length; i++) 
-        s.push( this.mtx[i].join(",") );
+    for (var i = 0; i < this.mtx.length; i++) {
+				if (Array.isArray(this.mtx[i])) {
+					s.push( this.mtx[i].join(",") );
+				} else {
+					console.log(this.mtx[i]);
+					// FIXME: Wrap the value inside an array of length 1
+					console.log([].push(this.mtx[i]));
+					s.push( [].push(this.mtx[i]) );
+				}
+		}
     return s.join("\n");
 }
 
@@ -41,21 +49,36 @@ Matrix.prototype.transpose = function() {
 }
 
 Matrix.prototype.mult = function(other) {
-    if (this.width != other.height) {
+		if (Array.isArray(other) && this.width != other.length) {
+				throw "error: incompatible sizes";
+		} else if (!Array.isArray(other) && this.width != other.height) {
         throw "error: incompatible sizes";
     }
  
-    var result = [];
-    for (var i = 0; i < this.height; i++) {
-        result[i] = [];
-        for (var j = 0; j < other.width; j++) {
-            var sum = 0;
-            for (var k = 0; k < this.width; k++) {
-                sum += this.mtx[i][k] * other.mtx[k][j];
-            }
-            result[i][j] = sum;
-        }
+		if (Array.isArray(other)) { // Matrix * Array
+			var result = new Array(this.height);
+			for (var i = 0; i < this.height; i++) {
+					var sum = 0;
+					for (var j = 0; j < other.length; j++) {
+							sum += this.mtx[i][j] * other[j];
+							console.log(this.mtx[i][j] + ' * ' + other[j] + ' = ' + (this.mtx[i][j] * other[j]));
+					}
+					result[i] = sum;
+			}
+		} else { // Matrix * Matrix
+	    var result = new Array(this.height);
+  	  for (var i = 0; i < this.height; i++) {
+      	  result[i] = new Array(other.width);
+	        for (var j = 0; j < other.width; j++) {
+  	          var sum = 0;
+    	        for (var k = 0; k < this.width; k++) {
+           	  	sum += this.mtx[i][k] * other.mtx[k][j];
+	            }
+  	          result[i][j] = sum;
+    	    }
+			}
     }
+		console.log(result);
     return new Matrix(result); 
 }
 
