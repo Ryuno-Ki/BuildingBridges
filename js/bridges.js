@@ -123,7 +123,9 @@ function updateInputField() {
 	var step   = document.getElementById('step');
 	var type   = document.getElementById('type');
 	var coords = document.getElementById('coords');
-	step.innerHTML = 'Schritt 2: Gelenke festlegen';
+	var staebe = document.getElementById('staebe-input');
+	var prnt   = coords.parentNode;
+	step.innerHTML = 'Schritt 2: Gelenke und Stäbe festlegen';
 	if (type.value == 'lager') {
 		type.value    = 'gelenk';
 		var lLabel    = document.createElement('label');
@@ -144,10 +146,19 @@ function updateInputField() {
 		r.type        = 'number';
 		r.min         = '0';
 		r.step        = '1';
-		coords.appendChild(lLabel);
-		coords.appendChild(l);
-		coords.appendChild(rLabel);
-		coords.appendChild(r);
+		var saveBtn   = document.createElement('button');
+		saveBtn.id    = 'save-stab';
+		saveBtn.type  = 'button';
+		saveBtn.appendChild(document.createTextNode('Speichern'));
+		var calcBtn   = document.createElement('button');
+		calcBtn.type  = 'button';
+		calcBtn.appendChild(document.createTextNode('Berechnen'));
+		staebe.appendChild(lLabel);
+		staebe.appendChild(l);
+		staebe.appendChild(rLabel);
+		staebe.appendChild(r);
+		staebe.appendChild(saveBtn);
+		prnt.appendChild(calcBtn);
 		/*
 		stabBtn.addEventListener('click', buildDistanceMatrix, false);
 		stabBtn.addEventListener('click', buildBridge, false);
@@ -166,10 +177,11 @@ function printCoordinates() {
 	clearList(lager);
 	clearList(gelenke);
 	for (var l = 0; l < b.lager.length; ++l) {
-		var option  = document.createElement('option');
-		option.text = b.lager[l].getPos();
-		option.value = b.lager[l].getPos();
-		lager.appendChild(option);
+		var current = b.lager[l];
+		var li      = document.createElement('li');
+		var liText  = current.name + ' at (' + current.getX() + ', ' + current.getY() + ')';
+		li.appendChild(document.createTextNode(liText));
+		lager.appendChild(li);
 	};
 	for (var g = 0; g < b.gelenke.length; ++g) {
 		var current = b.gelenke[g];
@@ -324,10 +336,17 @@ function consumeXml(xml) {
     for (var l = 0; l < bridgeDom.childNodes.length; ++l) {
 	    var liX = bridgeDom.childNodes[l].childNodes[0].getAttribute('x');
 	    var liY = bridgeDom.childNodes[l].childNodes[0].getAttribute('y');
-	    var lager = new Gelenk();
-	    lager.setX(liX);
-	    lager.setY(liY);
-	    b.addToList(lager);
+			if (bridgeDom.childNodes[l].nodeName == 'lager') {
+	    	var lager = new Lager();
+		    lager.setX(liX);
+		    lager.setY(liY);
+	  	  b.addToList(lager);
+			} else if (bridgeDom.childNodes[l].nodeName == 'gelenk') {
+	    	var gelenk = new Gelenk();
+		    gelenk.setX(liX);
+		    gelenk.setY(liY);
+	  	  b.addToList(gelenk);
+			}
     }
     updateCanvas();
     printCoordinates();
