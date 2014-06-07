@@ -170,6 +170,34 @@ Matrix.prototype.backwardSubstitution = function (vector) {
 	return result;
 }
 
+Array.prototype.scalarProduct = function(other) {
+  if (!Array.isArray(other)) {
+		throw "error: Not an array!";
+	}
+
+	if (this.length != other.length) {
+		throw "error: incompatible sizes!";
+	}
+
+	var result = 0;
+	for (var i = 0; i < this.length; i++) {
+		result += this[i] * other[i];
+	}
+	return result;
+}
+
+Array.prototype.norm = function() {
+	return Math.pow(this.scalarProduct(this), 1/2);
+}
+
+Array.prototype.cosine = function(other) {
+	if (!Array.isArray(other)) {
+		throw "error: Not an array!";
+	}
+
+	return (this.scalarProduct(other))/(this.norm() * other.norm());
+}
+
 // Monkeypatch Math.min for accepting arrays
 var standardMin = Math.min;
 Math.min = function() {
