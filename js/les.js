@@ -4,9 +4,14 @@ var m = new Matrix([ [1,2,3],
 var part = m.lr();
 var r = part.r;
 var l = part.l;
+var a = [4,0,3];
+var x = [13,7,15];
 console.log(m.toString());
-console.log(r.toString());
-console.log(l.toString());
+y = l.forwardSubstitution(x);
+x = r.backwardSubstitution(y);
+console.log(y);
+console.log(x);
+console.log(m.mult(x).toString());
 
 function buildLes() {
 	// E   … Equationmatrix, E € IR^(16x18)

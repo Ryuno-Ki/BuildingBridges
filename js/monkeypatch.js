@@ -16,9 +16,8 @@ Matrix.prototype.toString = function() {
 				if (Array.isArray(this.mtx[i])) {
 					s.push( this.mtx[i].join(",") );
 				} else {
-					console.log(this.mtx[i]);
 					// FIXME: Wrap the value inside an array of length 1
-					console.log([].push(this.mtx[i]));
+					//console.log([].push(this.mtx[i]));
 					s.push( this.mtx[i] );
 				}
 		}
@@ -61,7 +60,6 @@ Matrix.prototype.mult = function(other) {
 					var sum = 0;
 					for (var j = 0; j < other.length; j++) {
 							sum += this.mtx[i][j] * other[j];
-							console.log(this.mtx[i][j] + ' * ' + other[j] + ' = ' + (this.mtx[i][j] * other[j]));
 					}
 					result[i] = sum;
 			}
@@ -136,38 +134,38 @@ Matrix.prototype.det = function() {
 	return det;
 }
  
-Matrix.prototype.forwardSubstitution = function(matrix, vector) {
-	if (matrix.width != vector.length) {
+Matrix.prototype.forwardSubstitution = function(vector) {
+	if (this.width != vector.length) {
 		throw "error: incompatible sizes!";
 	}
-	var result = new Array(matrix.height);
-	result[0] = vector[0]/matrix.mtx[0][0];
+	var result = new Array(this.height);
+	result[0] = vector[0]/this.mtx[0][0];
 
 	for (var i = 1; i < vector.length; i++) {
 			var sum = 0;
-			for (var j = 0; j < i-1; j++) {
-					sum += matrix.mtx[i][j] * vector[j];
+			for (var j = 0; j < i; j++) {
+					sum += this.mtx[i][j] * result[j];
 			}
-			result[i] = (vector[i] - sum) / matrix.mtx[i][i];
+			result[i] = (vector[i] - sum) / this.mtx[i][i];
 	}
 	return result;
 }
 
-Matrix.prototype.backwardSubstitution = function (matrix, vector) {
-	if (matrix.width != vector.length) {
+Matrix.prototype.backwardSubstitution = function (vector) {
+	if (this.width != vector.length) {
 		throw "error: incompatible sizes!";
 	}
 
-	var mh = matrix.height;
+	var mh = this.height;
 	var result = new Array(mh);
-	result[mh-1] = vector[mh-1]/matrix.mtx[mh-1][mh-1];
+	result[mh-1] = vector[mh-1]/this.mtx[mh-1][mh-1];
 
-	for (var i = mh-1; i > 0; i--) {
+	for (var i = mh-2; i >= 0; i--) {
 		var sum = 0;
 		for (var j = i+1; j < mh; j++) {
-			sum += matrix.mtx[i][j] * vector[j];
+			sum += this.mtx[i][j] * result[j];
 		}
-		result[i] = (vector[i] - sum)/matrix.mtx[i][i];
+		result[i] = (vector[i] - sum)/this.mtx[i][i];
 	}
 	return result;
 }
