@@ -190,6 +190,23 @@ Array.prototype.norm = function() {
 	return Math.pow(this.scalarProduct(this), 1/2);
 }
 
+Array.prototype.normalise = function() {
+	var result = new Array(this.length);
+	var n      = this.norm();
+	for (var i = 0; i < this.length; i++) {
+		result[i] = this[i]/n;
+	}
+	return result;
+}
+
+Array.prototype.spherical = function() {
+	var result = new Array(2);
+	var normalised = this.normalise();
+	result[0] = this.cosine([1,0]);
+	result[1] = Math.pow(1-Math.pow(result[0],2),1/2);
+	return result;
+}
+
 Array.prototype.cosine = function(other) {
 	if (!Array.isArray(other)) {
 		throw "error: Not an array!";
