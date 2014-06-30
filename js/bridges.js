@@ -189,8 +189,10 @@ function printCoordinates() {
 		var liText  = current.name + ' at (' + current.getX() + ', ' + current.getY() + ')';
 		li.appendChild(document.createTextNode(liText));
 		gelenke.appendChild(li);
-		document.getElementById('left').max  = b.gelenke.length-1;
-		document.getElementById('right').max = b.gelenke.length-1;
+		var leftSelector = document.getElementById('left');
+		var rightSelector = document.getElementById('right');
+		if (leftSelector) { leftSelector.max  = b.gelenke.length-1;}
+		if (rightSelector) { rightSelector.max = b.gelenke.length-1; }
 	}
 };
 
@@ -331,8 +333,7 @@ function waitForTextReadComplete(reader) {
 function consumeXml(xml) {
     var bridgeDom = xml.childNodes[0];
     var lagerDom = bridgeDom.childNodes[0];
-		console.log(xml);
-		console.log(lagerDom.outerHTML);
+    console.log(bridgeDom.childNodes);
     for (var l = 0; l < bridgeDom.childNodes.length; ++l) {
 	    var liX = bridgeDom.childNodes[l].childNodes[0].getAttribute('x');
 	    var liY = bridgeDom.childNodes[l].childNodes[0].getAttribute('y');
