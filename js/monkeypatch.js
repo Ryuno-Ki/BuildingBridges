@@ -49,9 +49,9 @@ Matrix.prototype.transpose = function() {
 
 Matrix.prototype.mult = function(other) {
 		if (Array.isArray(other) && this.width != other.length) {
-				throw "error: incompatible sizes";
+				throw new Error("incompatible sizes");
 		} else if (!Array.isArray(other) && this.width != other.height) {
-        throw "error: incompatible sizes";
+        throw new Error("incompatible sizes");
     }
  
 		if (Array.isArray(other)) { // Matrix * Array
@@ -82,7 +82,7 @@ Matrix.prototype.mult = function(other) {
 
 Matrix.diag = function(diagEl) {
 		if (!Array.isArray(diagEl)) {
-			throw "error: Not an array";
+			throw new Error("Not an array");
 		}
 
 		var result = new Array(diagEl.length);
@@ -111,7 +111,7 @@ Matrix.prototype.lr = function() {
 	for (var i = 0; i < n-1; i++) {
 		for (var k = i+1; k < n; k++) {
 			if (r.mtx[i][i] == 0) {
-				throw "error: Cannot divide through zero at " + i + ", " + i;
+				throw new Error("Cannot divide through zero at (" + i + ", " + i + ')!');
 			}
 			l.mtx[k][i] = r.mtx[k][i] / r.mtx[i][i];
 			for (var j = i; j < n; j++) {
@@ -126,7 +126,9 @@ Matrix.prototype.lr = function() {
 }
 
 Matrix.prototype.det = function() {
-	var r   = this.lr().r;
+	// FIXME: Division by zero isn't caught!
+	try { this.lr(); } catch(e) { return 0;	}
+	var r = lr.r;
 	var det = 1;
 	for (var i = 0; i < this.width; i++) {
 		det *= r.mtx[i][i];
@@ -136,7 +138,7 @@ Matrix.prototype.det = function() {
  
 Matrix.prototype.forwardSubstitution = function(vector) {
 	if (this.width != vector.length) {
-		throw "error: incompatible sizes!";
+		throw new Error("incompatible sizes!");
 	}
 	var result = new Array(this.height);
 	result[0] = vector[0]/this.mtx[0][0];
@@ -153,7 +155,7 @@ Matrix.prototype.forwardSubstitution = function(vector) {
 
 Matrix.prototype.backwardSubstitution = function (vector) {
 	if (this.width != vector.length) {
-		throw "error: incompatible sizes!";
+		throw new Error("incompatible sizes!");
 	}
 
 	var mh = this.height;
@@ -172,11 +174,11 @@ Matrix.prototype.backwardSubstitution = function (vector) {
 
 Array.prototype.scalarProduct = function(other) {
   if (!Array.isArray(other)) {
-		throw "error: Not an array!";
+		throw new Error("Not an array!");
 	}
 
 	if (this.length != other.length) {
-		throw "error: incompatible sizes!";
+		throw new Error("incompatible sizes!");
 	}
 
 	var result = 0;
@@ -200,16 +202,20 @@ Array.prototype.normalise = function() {
 }
 
 Array.prototype.spherical = function() {
-	var result = new Array(2);
+	if (this.length != 2) {
+		throw new Error("Not an array of length 2!");
+	}
 	var normalised = this.normalise();
-	result[0] = this.cosine([1,0]);
-	result[1] = Math.pow(1-Math.pow(result[0],2),1/2);
-	return result;
+	return {
+		x: normalised[0],
+		y: normalised[1],
+		norm: this.norm()
+	}
 }
 
 Array.prototype.cosine = function(other) {
 	if (!Array.isArray(other)) {
-		throw "error: Not an array!";
+		throw new Error("Not an array!");
 	}
 
 	return (this.scalarProduct(other))/(this.norm() * other.norm());
