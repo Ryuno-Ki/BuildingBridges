@@ -172,8 +172,10 @@ function clearList(list) {
 function printCoordinates() {
 	var lager   = document.getElementById('lager');
 	var gelenke = document.getElementById('gelenke');
+	var staebe  = document.getElementById('staebe');
 	clearList(lager);
 	clearList(gelenke);
+	clearList(staebe);
 	for (var l = 0; l < b.lager.length; ++l) {
 		var current = b.lager[l];
 		var li      = document.createElement('li');
@@ -191,6 +193,13 @@ function printCoordinates() {
 		var rightSelector = document.getElementById('right');
 		if (leftSelector) { leftSelector.max  = b.gelenke.length-1;}
 		if (rightSelector) { rightSelector.max = b.gelenke.length-1; }
+	}
+	for (var s = 0; s < b.stab.length; s++) {
+		var current = b.stab[s];
+		var li      = document.createElement('li');
+		var liText  = current.name + ' between ' + current.leftEnd + ' and ' + current.rightEnd;
+		li.appendChild(document.createTextNode(liText));
+		staebe.appendChild(li);
 	}
 };
 
