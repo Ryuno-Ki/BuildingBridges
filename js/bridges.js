@@ -110,10 +110,8 @@ function updateCanvas(x,y) {
 	if (b.stab.length) {
 		for (var s = 0; s < b.stab.length; ++s) {
 			var current = b.stab[s];
-			var left    = b.lager[current.leftEnd];
-			var right   = b.gelenke[current.rightEnd];
-			console.log(left);
-			console.log(right);
+			var left    = current.leftEnd < 2 ? b.lager[current.leftEnd] : b.gelenke[current.leftEnd-2];
+			var right   = current.rightEnd < 2 ? b.lager[current.rightEnd] : b.gelenke[current.rightEnd-2];
 			drawLine(left.getX(), left.getY(), right.getX(), right.getY());
 		}
 	}
@@ -257,7 +255,7 @@ function annotate(text, el) {
 }
 
 function drawLine(x1, y1, x2, y2, dashed) {
-	console.log(x1 + ', ' + y1 + ', ' + x2 + ', ' + y2);
+  console.log('Drawing: (' + x1 + ', ' + y1 + ') to (' + x2 + ', ' + y2 + ')');
   var bridge = document.getElementById('bridge');
   var drawingContext = bridge.getContext('2d');
 	if (!drawingContext.setLineDash) {
@@ -333,10 +331,11 @@ function waitForTextReadComplete(reader) {
 function consumeXml(xml) {
     var bridgeDom = xml.childNodes[0];
     var lagerDom = bridgeDom.childNodes[0];
-    console.log(bridgeDom.childNodes);
     for (var l = 0; l < bridgeDom.childNodes.length; ++l) {
 	    var liX = bridgeDom.childNodes[l].childNodes[0].getAttribute('x');
 	    var liY = bridgeDom.childNodes[l].childNodes[0].getAttribute('y');
+	    var leftEnd = bridgeDom.childNodes[l].childNodes[0].getAttribute('leftEnd');
+	    var rightEnd = bridgeDom.childNodes[l].childNodes[0].getAttribute('rightEnd');
 			if (bridgeDom.childNodes[l].nodeName == 'lager') {
 	    	var lager = new Lager();
 		    lager.setX(liX);
@@ -347,6 +346,11 @@ function consumeXml(xml) {
 		    gelenk.setX(liX);
 		    gelenk.setY(liY);
 	  	  b.addToList(gelenk);
+			} else if (bridgeDom.childNodes[l].nodeName == 'stange') {
+		var stange = new Stab();
+		    stange.leftEnd = leftEnd;
+		    stange.rightEnd = rightEnd;
+		    b.addToList(stange);
 			}
     }
     updateCanvas();

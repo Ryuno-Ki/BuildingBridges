@@ -30,10 +30,10 @@ var Bridge = function() {
 
 Bridge.prototype.addToList = function(g) {
 	var canvas       = document.getElementById('bridge');
-	var x            = g.getX();
-	var y            = g.getY();
+	var x            = g.getX ? g.getX() : undefined;
+	var y            = g.getY ? g.getY() : undefined;
 	// TODO: isWithinBounds for canvas.width and gelenke with respect to lager
-	if (x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
+	if (x && x > 0 && x < canvas.width && y && y > 0 && y < canvas.height) {
 		if(this.isDuplicate(g)) {return false} ;
 		switch (g.name) {
 			case "Lager":
@@ -88,6 +88,8 @@ Bridge.prototype.addToList = function(g) {
 				break;
 		}
 	// TODO: Draw circle and add to list
+	} else if (g.name == 'Stab') {
+		this.stab.push(g);
 	} else {
 		console.log('Element exceeds boundaries: (' + x + ';' + y + ') '
 						  + 'does not fit into '
