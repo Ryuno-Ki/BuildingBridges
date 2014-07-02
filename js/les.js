@@ -1,20 +1,13 @@
 var m = new Matrix([ [1,2],
-										 [3,3] ]);
+					 [3,3] ]);
 var part = m.lr();
 var r = part.r;
 var l = part.l;
 var a = [4,0];
 var x = [1,0];
-console.log(m.toString());
 y = l.forwardSubstitution(x);
 x = r.backwardSubstitution(y);
-console.log(y);
-console.log(x);
 console.log(m.mult(x).toString());
-console.log('\n');
-console.log(a.cosine(x));
-
-// Compute cosine with x-axis!
 
 function buildLes() {
 	// E   … Equationmatrix, E € IR^(16x18)
@@ -32,7 +25,28 @@ function buildLes() {
 
 	// For every vector, multiply with -1 and determine cosine and sine
 	// Append two rows two matrix with the computed values at the respective positions
+	var matrix  = [];
+	var row     = [];
+	// TODO: Sort by leftEnd in b.stab
+	// Walk through the sorted set and add two rows (x/y) to the matrix 
+	// Then return the matrix
+	console.log(b.stab);
+	for (var g = 0; g < b.gelenke.length; g++) {
+		var current = toArray(b.gelenke[g]);
+		var spheric = current.spherical();
+		row.push(spheric.x);
+		row.push(spheric.y);
+		matrix.push(row);
+		var mat     = new Matrix(matrix);
+		console.log(mat.mtx);
+		console.log(mat instanceof Matrix);
+		console.log(mat.lr());
+	}
 };
 
 function solveLes() {
 };
+
+function toArray(element) {
+	return [element.getX(), element.getY()];
+}

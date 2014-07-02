@@ -76,7 +76,6 @@ Matrix.prototype.mult = function(other) {
     	    }
 			}
     }
-		console.log(result);
     return new Matrix(result); 
 }
 

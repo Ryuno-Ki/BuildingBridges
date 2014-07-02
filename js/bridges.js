@@ -149,6 +149,7 @@ function updateInputField() {
 		saveBtn.type  = 'button';
 		saveBtn.appendChild(document.createTextNode('Speichern'));
 		var calcBtn   = document.createElement('button');
+		calcBtn.id    = 'calculate';
 		calcBtn.type  = 'button';
 		calcBtn.appendChild(document.createTextNode('Berechnen'));
 		staebe.appendChild(lLabel);
@@ -157,6 +158,8 @@ function updateInputField() {
 		staebe.appendChild(r);
 		staebe.appendChild(saveBtn);
 		prnt.appendChild(calcBtn);
+		
+		calcBtn.addEventListener('click', buildLes, false);
 		/*
 		stabBtn.addEventListener('click', buildDistanceMatrix, false);
 		stabBtn.addEventListener('click', buildBridge, false);

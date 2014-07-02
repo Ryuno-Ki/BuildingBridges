@@ -95,7 +95,7 @@ Bridge.prototype.addToList = function(g) {
 						  + 'does not fit into '
 							+ ']0;' + canvas.width + '[x]0;' + canvas.height + '[.');
 		return false;
-	};
+	};	
 }
 
 Bridge.prototype.isDuplicate = function(g) {
