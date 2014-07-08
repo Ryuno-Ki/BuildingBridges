@@ -48,7 +48,16 @@ Matrix.prototype.transpose = function() {
 }
 
 Matrix.prototype.mult = function(other) {
-		if (Array.isArray(other) && this.width != other.length) {
+		if (isNumber(other)) {
+			var result = new Matrix(this);
+			for (var i = 0; i < this.height; i++) {
+				for (var j = 0; j < this.width; j++) {
+					this.mtx[i][j] *= other;
+				}
+			}
+			// FIXME: concat of functions broken -> matrix.mult(2).toString()
+			result = this;
+		} else if (Array.isArray(other) && this.width != other.length) {
 				throw new Error("incompatible sizes");
 		} else if (!Array.isArray(other) && this.width != other.height) {
         throw new Error("incompatible sizes");
@@ -100,6 +109,17 @@ Matrix.eyes = function(len) {
 		eyesEl[i] = 1;
 	}
 	return new Matrix.diag(eyesEl);
+}
+
+Matrix.fill = function(width, height, value) {
+	var result = new Array(height);
+	for (var i = 0; i < height; i++) {
+		result[i] = new Array(width);
+		for (var j = 0; j < width; j++) {
+			result[i][j] = value;
+		}
+	}
+	return new Matrix(result);
 }
 
 Matrix.prototype.lr = function() {
@@ -206,8 +226,8 @@ Array.prototype.spherical = function() {
 	}
 	var normalised = this.normalise();
 	return {
-		x: normalised[0],
-		y: normalised[1],
+		x: this[0] > 0 ? normalised[0] : -normalised[0],
+		y: this[1] > 0 ? normalised[1] : -normalised[1],
 		norm: this.norm()
 	}
 }
@@ -218,6 +238,13 @@ Array.prototype.cosine = function(other) {
 	}
 
 	return (this.scalarProduct(other))/(this.norm() * other.norm());
+}
+
+function byLeftEnd(first, second) {
+	var result = 0;
+	if (parseInt(first.leftEnd) < parseInt(second.leftEnd)) { result = -1; }
+	else if (parseInt(first.leftEnd) > parseInt(second.leftEnd)) { result = 1; }
+	return result;
 }
 
 // Monkeypatch Math.min for accepting arrays
@@ -244,4 +271,8 @@ function handleFileSelection() {
     reader.readAsText(file);
 };
 
+// kudos to https://stackoverflow.com/a/1830844
+function isNumber(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
+};
 // http://rosettacode.org/wiki/Matrix_multiplication#JavaScript
