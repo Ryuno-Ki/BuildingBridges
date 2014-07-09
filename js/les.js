@@ -1,3 +1,4 @@
+/*
 var m = new Matrix([ [1,2],
 					 [3,3] ]);
 var part = m.lr();
@@ -7,7 +8,8 @@ var a = [4,0];
 var x = [1,0];
 y = l.forwardSubstitution(x);
 x = r.backwardSubstitution(y);
-console.log(m.mult(x).toString());
+//console.log(m.mult(x).toString());
+*/
 
 function buildLes() {
 	// E   … Equationmatrix, E € IR^(16x18)
@@ -25,24 +27,39 @@ function buildLes() {
 
 	// For every vector, multiply with -1 and determine cosine and sine
 	// Append two rows two matrix with the computed values at the respective positions
-	var matrix  = [];
-	var row     = [];
-	// TODO: Sort by leftEnd in b.stab
-	// Walk through the sorted set and add two rows (x/y) to the matrix 
-	// Then return the matrix
-	console.log(b.stab);
-	for (var g = 0; g < b.gelenke.length; g++) {
-		var current = toArray(b.gelenke[g]);
-		var spheric = current.spherical();
-		row.push(spheric.x);
-		row.push(spheric.y);
-		matrix.push(row);
-		var mat     = new Matrix(matrix);
-		console.log(mat.mtx);
-		console.log(mat instanceof Matrix);
-		console.log(mat.lr());
+	// matrix € IR^(2*#Gelenke x #stab)
+	var matrix       = new Matrix.fill(18,16,0);
+	var sortedStaebe = b.stab;//.sort(byLeftEnd);
+	for (var s = 0; s < sortedStaebe.length; s++) {
+		var current = sortedStaebe[s];
+		matrix = insertIntoMatrix(s,current,matrix).copy();
+//		console.log(mat.lr());
 	}
+	console.log(matrix.replace(0, '    ').toString());
+	return matrix;
 };
+//	var a = [gelenk.getX(),gelenk.getY()];
+//	var s = a.spherical();
+function insertIntoMatrix(s,stab,matrix) {
+	var result = matrix.copy();
+	var left   = parseInt(stab.leftEnd);
+	var right  = parseInt(stab.rightEnd);
+	var leftG  = left > 1 ? b.gelenke[left-2] : undefined;
+	var rightG = right > 1 ? b.gelenke[right-2] : undefined;
+	if (leftG) {
+		var sp = [leftG.getX(), leftG.getY()];
+		sp = sp.spherical();
+		result.mtx[2*(left-2)][s] = sp.x.toFixed(2);
+		result.mtx[2*(left-2)+1][s] = sp.y.toFixed(2);
+	}
+	if (rightG) {
+		var sp = [rightG.getX(), rightG.getY()];
+		sp = sp.spherical();
+		result.mtx[2*(right-2)][s] = sp.x.toFixed(2);
+		result.mtx[2*(right-2)+1][s] = sp.y.toFixed(2);
+	}
+	return result;
+}
 
 function solveLes() {
 };
