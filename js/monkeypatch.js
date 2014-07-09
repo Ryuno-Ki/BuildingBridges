@@ -25,10 +25,10 @@ Matrix.prototype.toString = function() {
 }
 
 Matrix.prototype.copy = function() {
-		var c = new Array(this.width);
-		for (var i = 0; i < this.width; i++) {
-			c[i] = new Array(this.height);
-			for (var j = 0; j < this.height; j++) {
+		var c = new Array(this.height);
+		for (var i = 0; i < this.height; i++) {
+			c[i] = new Array(this.width);
+			for (var j = 0; j < this.width; j++) {
 				c[i][j] = this.mtx[i][j];
 			}
 		}
@@ -121,6 +121,17 @@ Matrix.fill = function(width, height, value) {
 		}
 	}
 	return new Matrix(result);
+}
+
+Matrix.prototype.replace = function(origin, alternative) {
+	for (var i = 0; i < this.height; i++) {
+		for (var j = 0; j < this.width; j++) {
+			if (this.mtx[i][j] == origin) {
+				this.mtx[i][j] = alternative;
+			}
+		}
+	}
+	return this;
 }
 
 Matrix.prototype.lr = function() {
@@ -226,9 +237,10 @@ Array.prototype.spherical = function() {
 		throw new Error("Not an array of length 2!");
 	}
 	var normalised = this.normalise();
+	console.log(this, normalised);
 	return {
-		x: this[0] > 0 ? normalised[0] : -normalised[0],
-		y: this[1] > 0 ? normalised[1] : -normalised[1],
+		x: this[1]-this[0] > 0 ? normalised[0] : -1 * normalised[0],
+		y: this[0]-this[1] > 0 ? normalised[1] : -1 * normalised[1],
 		norm: this.norm()
 	}
 }
