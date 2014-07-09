@@ -25,9 +25,9 @@ Matrix.prototype.toString = function() {
 }
 
 Matrix.prototype.copy = function() {
-		var c = [];
+		var c = new Array(this.width);
 		for (var i = 0; i < this.width; i++) {
-			c[i] = [];
+			c[i] = new Array(this.height);
 			for (var j = 0; j < this.height; j++) {
 				c[i][j] = this.mtx[i][j];
 			}
@@ -48,44 +48,45 @@ Matrix.prototype.transpose = function() {
 }
 
 Matrix.prototype.mult = function(other) {
-		if (isNumber(other)) {
-			var result = new Matrix(this);
-			for (var i = 0; i < this.height; i++) {
-				for (var j = 0; j < this.width; j++) {
-					this.mtx[i][j] *= other;
+	if (Array.isArray(other) && this.width != other.length) {
+		throw new Error("incompatible sizes (Matrix*Array)");
+	} else if (!Array.isArray(other) && other.height && this.width != other.height) {
+       throw new Error("incompatible sizes (Matrix*Matrix)");
+	} else if (!isNumber(other)) {
+		throw new Error("incompatible sizes (Matrix*Number)");
+	}
+
+	if (isNumber(other)) { // Matrix * Number
+		var result = new Array(this.height);
+		for (var i = 0; i < this.height; i++) {
+			result[i] = new Array(this.width);
+			for (var j = 0; j < this.width; j++) {
+				result[i][j] = this.mtx[i][j] * other;
+			}
+		}
+	} else if (Array.isArray(other)) { // Matrix * Array
+		var result = new Array(this.height);
+		for (var i = 0; i < this.height; i++) {
+				var sum = 0;
+				for (var j = 0; j < other.length; j++) {
+						sum += this.mtx[i][j] * other[j];
 				}
+				result[i] = sum;
+		}
+	} else { // Matrix * Matrix
+		var result = new Array(this.height);
+		for (var i = 0; i < this.height; i++) {
+			result[i] = new Array(other.width);
+			for (var j = 0; j < other.width; j++) {
+				var sum = 0;
+				for (var k = 0; k < this.width; k++) {
+					sum += this.mtx[i][k] * other.mtx[k][j];
+				}
+			result[i][j] = sum;
 			}
-			// FIXME: concat of functions broken -> matrix.mult(2).toString()
-			result = this;
-		} else if (Array.isArray(other) && this.width != other.length) {
-				throw new Error("incompatible sizes");
-		} else if (!Array.isArray(other) && this.width != other.height) {
-        throw new Error("incompatible sizes");
-    }
- 
-		if (Array.isArray(other)) { // Matrix * Array
-			var result = new Array(this.height);
-			for (var i = 0; i < this.height; i++) {
-					var sum = 0;
-					for (var j = 0; j < other.length; j++) {
-							sum += this.mtx[i][j] * other[j];
-					}
-					result[i] = sum;
-			}
-		} else { // Matrix * Matrix
-	    var result = new Array(this.height);
-  	  for (var i = 0; i < this.height; i++) {
-      	  result[i] = new Array(other.width);
-	        for (var j = 0; j < other.width; j++) {
-  	          var sum = 0;
-    	        for (var k = 0; k < this.width; k++) {
-           	  	sum += this.mtx[i][k] * other.mtx[k][j];
-	            }
-  	          result[i][j] = sum;
-    	    }
-			}
-    }
-    return new Matrix(result); 
+		}
+	}
+	return new Matrix(result); 
 }
 
 Matrix.diag = function(diagEl) {
