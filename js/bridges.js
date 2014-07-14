@@ -159,7 +159,7 @@ function updateInputField() {
 		staebe.appendChild(saveBtn);
 		prnt.appendChild(calcBtn);
 		
-		calcBtn.addEventListener('click', buildLes, false);
+		calcBtn.addEventListener('click', solveLes, false);
 		/*
 		stabBtn.addEventListener('click', buildDistanceMatrix, false);
 		stabBtn.addEventListener('click', buildBridge, false);
