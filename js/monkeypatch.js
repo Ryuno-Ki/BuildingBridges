@@ -48,14 +48,7 @@ Matrix.prototype.transpose = function() {
 }
 
 Matrix.prototype.mult = function(other) {
-	if (Array.isArray(other) && this.width != other.length) {
-		throw new Error("incompatible sizes (Matrix*Array)");
-	} else if (!Array.isArray(other) && other.height && this.width != other.height) {
-       throw new Error("incompatible sizes (Matrix*Matrix)");
-	} else if (!isNumber(other)) {
-		throw new Error("incompatible sizes (Matrix*Number)");
-	}
-
+	// TODO: Sanitinzing
 	if (isNumber(other)) { // Matrix * Number
 		var result = new Array(this.height);
 		for (var i = 0; i < this.height; i++) {
@@ -168,7 +161,9 @@ Matrix.prototype.det = function() {
 }
  
 Matrix.prototype.forwardSubstitution = function(vector) {
-	if (this.width != vector.length) {
+	if (Array.isArray(vector) && this.width != vector.length) {
+		throw new Error("incompatible sizes!");
+	} else if (vector.height && this.width != vector.height) {
 		throw new Error("incompatible sizes!");
 	}
 	var result = new Array(this.height);
@@ -203,6 +198,20 @@ Matrix.prototype.backwardSubstitution = function (vector) {
 	return result;
 }
 
+Array.prototype.mult = function(other) {
+	if (!Array.isArray(other) && !isNumber(other)) {
+		throw new Error("Not compatible!");
+	}
+	if(Array.isArray(other)) {
+		return this.scalarProduct(other);
+	}
+	// isNumber(other)
+	for (var i = 0; i < this.length; i++) {
+		this[i] *= other;
+	}
+	return this;
+}
+
 Array.prototype.scalarProduct = function(other) {
   if (!Array.isArray(other)) {
 		throw new Error("Not an array!");
@@ -230,19 +239,6 @@ Array.prototype.normalise = function() {
 		result[i] = this[i]/n;
 	}
 	return result;
-}
-
-Array.prototype.spherical = function() {
-	if (this.length != 2) {
-		throw new Error("Not an array of length 2!");
-	}
-	var normalised = this.normalise();
-	console.log(this, normalised);
-	return {
-		x: this[1]-this[0] > 0 ? normalised[0] : -1 * normalised[0],
-		y: this[0]-this[1] > 0 ? normalised[1] : -1 * normalised[1],
-		norm: this.norm()
-	}
 }
 
 Array.prototype.cosine = function(other) {
