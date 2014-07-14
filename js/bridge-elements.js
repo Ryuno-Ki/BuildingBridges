@@ -129,7 +129,14 @@ var Stab = function() {
   this._distance = null;
 };
 
-Stab.prototype.getDistance = function()         { return this._distance; };
+Stab.prototype.getDistance = function()         { 
+    if (!this._distance) {
+        var left = this.leftEnd < 2 ? b.lager[parseInt(this.leftEnd)] : b.gelenke[parseInt(this.leftEnd)-2];
+        var right = this.rightEnd < 2 ? b.lager[parseInt(this.rightEnd)] :  b.gelenke[parseInt(this.rightEnd)-2];
+        this._distance = Math.pow(Math.pow(left.getX() - right.getX(), 2) + Math.pow(left.getY() - right.getY(), 2), 1/2);
+    }
+    return this._distance;
+};
 Stab.prototype.setDistance = function(distance) { this._distance = distance; }
 
 var Lager = function(name) {
