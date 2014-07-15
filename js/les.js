@@ -16,7 +16,7 @@ function buildLes() {
 	var gravity   = 8.91; // FIXME: Read from site
 	var matrix    = new Matrix.fill(18,16,0);
 	var lengths   = new Array(b.stab.length);
-	var rightHand = new Matrix.fill(2,16,0);
+	var rightHand = new Matrix.fill(1,16,0);
 	var stab      = b.stab;
 	for (var s = 0; s < stab.length; s++) {
 		var current = stab[s];
@@ -27,8 +27,8 @@ function buildLes() {
 		lengths[l] = 1/b.stab[l].getDistance();
 	}
 	
-	for (var r = 0; r < rightHand.height; r++) {
-		rightHand.mtx[r][1] = mass * gravity;
+	for (var r = 1; r < rightHand.height; r += 2) {
+		rightHand.mtx[r] = mass * gravity;
 	}
 	console.log(matrix.replace(0, '     ').toString());
 	lengths = Matrix.diag(lengths);
@@ -62,18 +62,17 @@ function solveLes() {
 	var preface = buildLes();
 	var matrix = preface.matrix;
 	var lengths   = preface.lengths;
-	var rightHand = preface.rightHand;
-	var result = matrix.mult(lengths).mult(matrix.transpose());
-	var part = result.lr();
-	var r = part.r;
-	var l = part.l;
-	y = l.forwardSubstitution(rightHand);
-	x = r.backwardSubstitution(y);
+	var b = preface.rightHand;
+	var A = matrix.mult(lengths).mult(matrix.transpose());
+	var part = A.lr();
+	var R = part.r;
+	var L = part.l;
+	y = L.forwardSubstitution(b);
+	x = R.backwardSubstitution(y);
 	//console.log(result.mult(x).toString());
 	//paint in red and write to file
-	console.log(result.replace(0, '    ').toString());
-	console.log(result.mult(x).toString());
-	console.log(rightHand.toString());
+	console.log(A.mult(x).toString());
+	console.log(b.toString());
 	return result;
 };
 
