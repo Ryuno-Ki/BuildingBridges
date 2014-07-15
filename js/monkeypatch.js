@@ -167,14 +167,14 @@ Matrix.prototype.forwardSubstitution = function(vector) {
 		throw new Error("incompatible sizes!");
 	}
 	var result = new Array(this.height);
-	result[0] = vector[0]/this.mtx[0][0];
+	result[0] = vector.mtx[0]/this.mtx[0][0];
 
-	for (var i = 1; i < vector.length; i++) {
+	for (var i = 1; i < vector.height; i++) {
 			var sum = 0;
 			for (var j = 0; j < i; j++) {
 					sum += this.mtx[i][j] * result[j];
 			}
-			result[i] = (vector[i] - sum) / this.mtx[i][i];
+			result[i] = (vector.mtx[i] - sum) / this.mtx[i][i];
 	}
 	return result;
 }
