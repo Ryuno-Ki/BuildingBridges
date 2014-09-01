@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     watch: {
       scripts: {
         files: ['js/*.js','test/spec/*.js'],
-        tasks: ['jshint','jsdoc', 'jasmine:pivotal:build'],
+        tasks: ['jshint','jsdoc','jasmine', 'jasmine:pivotal:build'],
       },
     },
     jshint: {
