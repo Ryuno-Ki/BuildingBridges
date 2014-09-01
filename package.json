@@ -1,0 +1,35 @@
+{
+  "name": "BuildingBridges",
+  "version": "0.8.0",
+  "description": "Calculates gravity on a bridge (via solving of a linear equation system)",
+  "main": "js/main.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "jaenisae@stud32.mathematik.uni-stuttgart.de:/home/2008/jaenisae/Documents/Studium/git"
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt-contrib-connect": "^0.8.0",
+    "grunt-contrib-jasmine": "^0.7.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-uglify": "0.5.0",
+    "grunt-contrib-watch": "0.6.1",
+    "grunt-jsdoc": "0.5.7",
+    "grunt-notify": "0.3.1",
+    "jasmine-node": "2.0.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "keywords": [
+    "linear equation system",
+    "gravity"
+  ],
+  "author": "André Jaenisch",
+  "license": "Eiffel License v2"
+}
