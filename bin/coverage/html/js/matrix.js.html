@@ -199,7 +199,7 @@
     <h1>Code coverage report for <span class="entity">js/matrix.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">48.28% <small>(70 / 145)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">48.98% <small>(72 / 147)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
         Branches: <span class="metric">50% <small>(17 / 34)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
@@ -208,7 +208,7 @@
         Functions: <span class="metric">40% <small>(6 / 15)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">48.95% <small>(70 / 143)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">49.66% <small>(72 / 145)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -485,7 +485,9 @@
 267
 268
 269
-270</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+270
+271
+272</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -541,6 +543,8 @@
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5</span>
+<span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
@@ -761,15 +765,15 @@
 //                      [4,16,64,256],
 //                      [5,25,125,625] ]);
 function Matrix(ary) {
-	'use strict';
-    this.mtx    = ary
+    'use strict';
+    this.mtx    = ary;
     this.height = ary.length;
     this.width  = Array.isArray(ary[0]) ? ary[0].length : <span class="branch-1 cbranch-no" title="branch not covered" >1;</span>
 }
  
 Matrix.prototype.toString = function() {
-	'use strict';
-    var s = []
+    'use strict';
+    var s = [];
     for (var i = 0; i &lt; this.mtx.length; i++) {
 				<span class="missing-if-branch" title="else path not taken" >E</span>if (Array.isArray(this.mtx[i])) {
 					s.push( this.mtx[i].join(",") );
@@ -780,7 +784,7 @@ Matrix.prototype.toString = function() {
 				}
 		}
     return s.join("\n");
-}
+};
 &nbsp;
 Matrix.prototype.copy = <span class="fstat-no" title="function not covered" >function() {</span>
 	'use strict';
@@ -792,7 +796,7 @@ Matrix.prototype.copy = <span class="fstat-no" title="function not covered" >fun
 			}
 		}
 <span class="cstat-no" title="statement not covered" >		return new Matrix(c);</span>
-}
+};
  
 // returns a new matrix
 Matrix.prototype.transpose = <span class="fstat-no" title="function not covered" >function() {</span>
@@ -805,16 +809,18 @@ Matrix.prototype.transpose = <span class="fstat-no" title="function not covered"
         }
     }
 <span class="cstat-no" title="statement not covered" >    return new Matrix(transposed);</span>
-}
+};
 &nbsp;
 Matrix.prototype.mult = function(other) {
 	'use strict';
 	// TODO: Sanitinzing
+	var result;
+	var i, j, sum;
 	if (isNumber(other)) { // Matrix * Number
-		var result = new Array(this.height);
-		for (var i = 0; i &lt; this.height; i++) {
+		result = new Array(this.height);
+		for (i = 0; i &lt; this.height; i++) {
 			result[i] = new Array(this.width);
-			for (var j = 0; j &lt; this.width; j++) {
+			for (j = 0; j &lt; this.width; j++) {
 				result[i][j] = trunc(this.mtx[i][j] * other);
 			}
 		}
@@ -823,10 +829,10 @@ Matrix.prototype.mult = function(other) {
 		if (this.width != other.length) {
 			throw new Error("Incompatible Sizes!");
 		}
-		var result = new Array(this.height);
-		for (var i = 0; i &lt; this.height; i++) {
-				var sum = 0;
-				for (var j = 0; j &lt; other.length; j++) {
+		result = new Array(this.height);
+		for (i = 0; i &lt; this.height; i++) {
+				sum = 0;
+				for (j = 0; j &lt; other.length; j++) {
 						sum += this.mtx[i][j] * other[j];
 				}
 				result[i] = trunc(sum);
@@ -837,13 +843,13 @@ Matrix.prototype.mult = function(other) {
 		if (this.width != other.height) {
 			throw new Error("Incompatible Sizes!");
 		}
-		var result = new Array(this.height);
+		result = new Array(this.height);
 		//console.log(this.height + 'x' + this.width,'*',
 		//		   other.height + 'x' + other.width);
-		for (var i = 0; i &lt; this.height; i++) {
+		for (i = 0; i &lt; this.height; i++) {
 			result[i] = new Array(other.width);
-			for (var j = 0; j &lt; other.width; j++) {
-				var sum = 0;
+			for (j = 0; j &lt; other.width; j++) {
+				sum = 0;
 				//console.log('Multiplying ' + (i+1) + 'th row with ' +
 				//(j+1) + 'th col');
 				for (var k = 0; k &lt; this.width; k++) {				
@@ -859,7 +865,7 @@ Matrix.prototype.mult = function(other) {
 		}
 		return new Matrix(result); 
 	}	
-}
+};
 &nbsp;
 Matrix.prototype.add = function(other) {
 	'use strict';
@@ -874,7 +880,7 @@ Matrix.prototype.add = function(other) {
 		}
 	}
 	return new Matrix(result); 
-}
+};
 &nbsp;
 Matrix.prototype.minus = <span class="fstat-no" title="function not covered" >function(other) {</span>
 	'use strict';
@@ -889,7 +895,7 @@ Matrix.prototype.minus = <span class="fstat-no" title="function not covered" >fu
 		}
 	}
 <span class="cstat-no" title="statement not covered" >	return new Matrix(result); </span>
-}
+};
 &nbsp;
 Matrix.diag = function(diagEl) {
 	'use strict';
@@ -905,7 +911,7 @@ Matrix.diag = function(diagEl) {
 				}
 		}
 		return new Matrix(result);
-}
+};
 &nbsp;
 Matrix.eyes = function(len) {
 	'use strict';
@@ -914,7 +920,7 @@ Matrix.eyes = function(len) {
 		eyesEl[i] = 1;
 	}
 	return new Matrix.diag(eyesEl);
-}
+};
 &nbsp;
 Matrix.fill = <span class="fstat-no" title="function not covered" >function(width, height, value) {</span>
 	'use strict';
@@ -926,7 +932,7 @@ Matrix.fill = <span class="fstat-no" title="function not covered" >function(widt
 		}
 	}
 <span class="cstat-no" title="statement not covered" >	return new Matrix(result);</span>
-}
+};
 &nbsp;
 Matrix.prototype.replace = <span class="fstat-no" title="function not covered" >function(origin, alternative) {</span>
 	'use strict';
@@ -939,7 +945,7 @@ Matrix.prototype.replace = <span class="fstat-no" title="function not covered" >
 		}
 	}
 <span class="cstat-no" title="statement not covered" >	return result;</span>
-}
+};
 &nbsp;
 Matrix.prototype.lr = <span class="fstat-no" title="function not covered" >function() {</span>
 	'use strict';
@@ -950,7 +956,7 @@ Matrix.prototype.lr = <span class="fstat-no" title="function not covered" >funct
 	// FIXME: Truncat das not work, that is, divident still near zero
 <span class="cstat-no" title="statement not covered" >	for (var i = 0; i &lt; n-1; i++) {</span>
 <span class="cstat-no" title="statement not covered" >		for (var k = i+1; k &lt; n; k++) {</span>
-<span class="cstat-no" title="statement not covered" >			if (r.mtx[i][i] == 0) {</span>
+<span class="cstat-no" title="statement not covered" >			if (r.mtx[i][i] === 0) {</span>
 				//console.log(r.replace(0,'     ').toString());
 <span class="cstat-no" title="statement not covered" >				throw new Error("Cannot divide through zero at (" + i + ", " + i + ')!');</span>
 			}
@@ -966,8 +972,8 @@ Matrix.prototype.lr = <span class="fstat-no" title="function not covered" >funct
 <span class="cstat-no" title="statement not covered" >	return {</span>
 		l: l,
 		r: r
-	}
-}
+	};
+};
 &nbsp;
 Matrix.prototype.det = <span class="fstat-no" title="function not covered" >function() {</span>
 	'use strict';
@@ -979,7 +985,7 @@ Matrix.prototype.det = <span class="fstat-no" title="function not covered" >func
 <span class="cstat-no" title="statement not covered" >		det *= r.mtx[i][i];</span>
 	}
 <span class="cstat-no" title="statement not covered" >	return det;</span>
-}
+};
  
 Matrix.prototype.forwardSubstitution = <span class="fstat-no" title="function not covered" >function(vector) {</span>
 	'use strict';
@@ -997,7 +1003,7 @@ Matrix.prototype.forwardSubstitution = <span class="fstat-no" title="function no
 <span class="cstat-no" title="statement not covered" >			result[i] = trunc((vector[i] - sum) / this.mtx[i][i]);</span>
 	}
 <span class="cstat-no" title="statement not covered" >	return result;</span>
-}
+};
 &nbsp;
 Matrix.prototype.backwardSubstitution = <span class="fstat-no" title="function not covered" >function (vector) {</span>
 	'use strict';
@@ -1028,7 +1034,7 @@ Matrix.prototype.backwardSubstitution = <span class="fstat-no" title="function n
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Sep 01 2014 13:44:31 GMT+0200 (CEST)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Sep 01 2014 14:19:54 GMT+0200 (CEST)</div>
 </div>
 
 <script src="../prettify.js"></script>

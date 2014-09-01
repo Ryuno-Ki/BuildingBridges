@@ -199,7 +199,7 @@
     <h1>Code coverage report for <span class="entity">js/bridge-elements.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">25.69% <small>(28 / 109)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">26.42% <small>(28 / 106)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
         Branches: <span class="metric">0% <small>(0 / 57)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
@@ -208,7 +208,7 @@
         Functions: <span class="metric">11.76% <small>(2 / 17)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">28.57% <small>(28 / 98)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">29.47% <small>(28 / 95)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -616,14 +616,7 @@
 398
 399
 400
-401
-402
-403
-404
-405
-406
-407
-408</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+401</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -689,7 +682,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -712,15 +704,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -731,8 +719,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1092,11 +1078,10 @@ Bridge.prototype.addToList = <span class="fstat-no" title="function not covered"
 <span class="cstat-no" title="statement not covered" >	var x            = g.getX ? g.getX() : undefined;</span>
 <span class="cstat-no" title="statement not covered" >	var y            = g.getY ? g.getY() : undefined;</span>
 <span class="cstat-no" title="statement not covered" >	if (x &amp;&amp; x &gt; 0 &amp;&amp; x &lt; canvas.width &amp;&amp; y &amp;&amp; y &gt; 0 &amp;&amp; y &lt; canvas.height) {</span>
-<span class="cstat-no" title="statement not covered" >		if(this.isDuplicate(g)) {<span class="cstat-no" title="statement not covered" >return false}</span> </span>;
+<span class="cstat-no" title="statement not covered" >		if(this.isDuplicate(g)) {<span class="cstat-no" title="statement not covered" >return false;}</span></span>
 <span class="cstat-no" title="statement not covered" >		switch (g.name) {</span>
 			case "Lager":
-<span class="cstat-no" title="statement not covered" >				console.log((this.lager.length+1) + '. ' + g.name</span>
-						+ ' at (' + x + ',' + y + ').');
+<span class="cstat-no" title="statement not covered" >				console.log((this.lager.length+1) + '. ' + g.name + ' at (' + x + ',' + y + ').');</span>
 <span class="cstat-no" title="statement not covered" >				var distToLeft   = x - 0;</span>
 <span class="cstat-no" title="statement not covered" >				var distToRight  = canvas.width - x;</span>
 <span class="cstat-no" title="statement not covered" >				console.log('Distance to left boundary: ' + distToLeft);</span>
@@ -1113,37 +1098,31 @@ Bridge.prototype.addToList = <span class="fstat-no" title="function not covered"
 					} else {
 <span class="cstat-no" title="statement not covered" >						g.setPos('right');</span>
 					}
-				};
+				}
 <span class="cstat-no" title="statement not covered" >				if (b.lager.length) { // Adjust the y-coord of the 2nd lager</span>
 <span class="cstat-no" title="statement not covered" >					g.setY((b.lager[0].getY()));</span>
 				}
 <span class="cstat-no" title="statement not covered" >				this.lager.push(g);</span>
 <span class="cstat-no" title="statement not covered" >				return true;</span>
-<span class="cstat-no" title="statement not covered" >				break;</span>
 			case "Gelenk":
-<span class="cstat-no" title="statement not covered" >				console.log((this.gelenke.length+1) + '. ' + g.name</span>
-			                  + ' at (' + x + ',' + y + ').');
+<span class="cstat-no" title="statement not covered" >				console.log((this.gelenke.length+1) + '. ' + g.name + ' at (' + x + ',' + y + ').');</span>
 <span class="cstat-no" title="statement not covered" >				this.gelenke.push(g);</span>
 <span class="cstat-no" title="statement not covered" >				return true;</span>
-<span class="cstat-no" title="statement not covered" >				break;</span>
 			default:
 <span class="cstat-no" title="statement not covered" >				console.log("I don't know, where to add.");</span>
 <span class="cstat-no" title="statement not covered" >				return false;</span>
-<span class="cstat-no" title="statement not covered" >				break;</span>
 		}
 	// TODO: Draw circle and add to list
 	} else <span class="cstat-no" title="statement not covered" >if (g.name == 'Stab') {</span>
-<span class="cstat-no" title="statement not covered" >        if (this.isDuplicate(g)) { <span class="cstat-no" title="statement not covered" >return false; </span>};</span>
+<span class="cstat-no" title="statement not covered" >        if (this.isDuplicate(g)) { <span class="cstat-no" title="statement not covered" >return false; </span>}</span>
 <span class="cstat-no" title="statement not covered" >		this.stab.push(g);</span>
 <span class="cstat-no" title="statement not covered" >		return true;</span>
 	} else {
-<span class="cstat-no" title="statement not covered" >		console.log('Element exceeds boundaries: (' + x + ';' + y + ') '</span>
-						  + 'does not fit into '
-							+ ']0;' + canvas.width + '[x]0;' + canvas.height + '[.');
+<span class="cstat-no" title="statement not covered" >		console.log('Element exceeds boundaries: (' + x + ';' + y + ') ' + 'does not fit into ' + ']0;' + canvas.width + '[x]0;' + canvas.height + '[.');</span>
 <span class="cstat-no" title="statement not covered" >		return false;</span>
-	};	
+	}	
 <span class="cstat-no" title="statement not covered" >	return false;</span>
-}
+};
 &nbsp;
 /**
  * Checks, whether the param is already in the respective list
@@ -1183,7 +1162,7 @@ Bridge.prototype.isDuplicate = <span class="fstat-no" title="function not covere
         default:
 <span class="cstat-no" title="statement not covered" >            return false;</span>
 	}
-}
+};
 &nbsp;
 /**
  * Checks, whether the position matches pos
@@ -1196,8 +1175,8 @@ Bridge.prototype.isDuplicate = <span class="fstat-no" title="function not covere
  * @returns {boolean} true|false - Depends on the check
  */
 Bridge.prototype.isPosSet = <span class="fstat-no" title="function not covered" >function(bItem, pos) {</span>
-<span class="cstat-no" title="statement not covered" >	return (bItem &amp;&amp; bItem.getPos() == pos)</span>
-}
+<span class="cstat-no" title="statement not covered" >	return (bItem &amp;&amp; bItem.getPos() == pos);</span>
+};
 &nbsp;
 /**
  * Represents a Gelenk within the bridge
@@ -1373,7 +1352,7 @@ Stab.prototype.getDistance = <span class="fstat-no" title="function not covered"
  * @param {number} distance - the new distance
  * @returns undefined
  */
-Stab.prototype.setDistance = <span class="fstat-no" title="function not covered" >function(distance) {</span> <span class="cstat-no" title="statement not covered" >this._distance = distance; </span>}
+Stab.prototype.setDistance = <span class="fstat-no" title="function not covered" >function(distance) {</span> <span class="cstat-no" title="statement not covered" >this._distance = distance; </span>};
 &nbsp;
 /**
  * Returns the private property mass
@@ -1442,7 +1421,7 @@ Lager.prototype.constructor = Lager;
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Sep 01 2014 13:44:31 GMT+0200 (CEST)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Sep 01 2014 14:19:54 GMT+0200 (CEST)</div>
 </div>
 
 <script src="../prettify.js"></script>
