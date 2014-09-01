@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
     },
     jshint: {
-      all: ['Gruntfile.js'],
+      all: ['Gruntfile.js','js/*.js'],
       force: 'true',
       jshintrc: 'true'
     },
@@ -47,6 +47,33 @@ module.exports = function(grunt) {
 	  outfile: 'test/SpecRunner.html',
 	  keepRunner: true
         }
+      },
+      coverage: {
+        src: 'js/*.js',
+	options: {
+	  specs: 'test/spec/*Spec.js',
+          template: require('grunt-template-jasmine-istanbul'),
+	  templateOptions: {
+	    coverage: 'bin/coverage/coverage.json',
+	    report: [
+              {
+                type: 'html',
+                options: {
+                  dir: 'bin/coverage/html'
+                }
+              },
+	      {
+	        type: 'cobertura',
+		options: {
+		  dir: 'bin/coverage/cobertura'
+                }
+              },
+              {
+                type: 'text-summary'
+              }
+            ]
+          }
+        }
       }
     }
   });
@@ -63,4 +90,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint','uglify','watch']);
   grunt.registerTask('dev', ['notify_hooks','jshint', 'jasmine','watch']);
   grunt.registerTask('test', ['jshint', 'jasmine']);
+  grunt.registerTask('test:coverage', ['jasmine:coverage']);
 };
