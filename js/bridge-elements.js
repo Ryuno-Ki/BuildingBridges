@@ -60,11 +60,10 @@ Bridge.prototype.addToList = function(g) {
 	var x            = g.getX ? g.getX() : undefined;
 	var y            = g.getY ? g.getY() : undefined;
 	if (x && x > 0 && x < canvas.width && y && y > 0 && y < canvas.height) {
-		if(this.isDuplicate(g)) {return false} ;
+		if(this.isDuplicate(g)) {return false;}
 		switch (g.name) {
 			case "Lager":
-				console.log((this.lager.length+1) + '. ' + g.name
-						+ ' at (' + x + ',' + y + ').');
+				console.log((this.lager.length+1) + '. ' + g.name + ' at (' + x + ',' + y + ').');
 				var distToLeft   = x - 0;
 				var distToRight  = canvas.width - x;
 				console.log('Distance to left boundary: ' + distToLeft);
@@ -81,37 +80,31 @@ Bridge.prototype.addToList = function(g) {
 					} else {
 						g.setPos('right');
 					}
-				};
+				}
 				if (b.lager.length) { // Adjust the y-coord of the 2nd lager
 					g.setY((b.lager[0].getY()));
 				}
 				this.lager.push(g);
 				return true;
-				break;
 			case "Gelenk":
-				console.log((this.gelenke.length+1) + '. ' + g.name
-			                  + ' at (' + x + ',' + y + ').');
+				console.log((this.gelenke.length+1) + '. ' + g.name + ' at (' + x + ',' + y + ').');
 				this.gelenke.push(g);
 				return true;
-				break;
 			default:
 				console.log("I don't know, where to add.");
 				return false;
-				break;
 		}
 	// TODO: Draw circle and add to list
 	} else if (g.name == 'Stab') {
-        if (this.isDuplicate(g)) { return false; };
+        if (this.isDuplicate(g)) { return false; }
 		this.stab.push(g);
 		return true;
 	} else {
-		console.log('Element exceeds boundaries: (' + x + ';' + y + ') '
-						  + 'does not fit into '
-							+ ']0;' + canvas.width + '[x]0;' + canvas.height + '[.');
+		console.log('Element exceeds boundaries: (' + x + ';' + y + ') ' + 'does not fit into ' + ']0;' + canvas.width + '[x]0;' + canvas.height + '[.');
 		return false;
-	};	
+	}	
 	return false;
-}
+};
 
 /**
  * Checks, whether the param is already in the respective list
@@ -151,7 +144,7 @@ Bridge.prototype.isDuplicate = function(g) {
         default:
             return false;
 	}
-}
+};
 
 /**
  * Checks, whether the position matches pos
@@ -164,8 +157,8 @@ Bridge.prototype.isDuplicate = function(g) {
  * @returns {boolean} true|false - Depends on the check
  */
 Bridge.prototype.isPosSet = function(bItem, pos) {
-	return (bItem && bItem.getPos() == pos)
-}
+	return (bItem && bItem.getPos() == pos);
+};
 
 /**
  * Represents a Gelenk within the bridge
@@ -341,7 +334,7 @@ Stab.prototype.getDistance = function()         {
  * @param {number} distance - the new distance
  * @returns undefined
  */
-Stab.prototype.setDistance = function(distance) { this._distance = distance; }
+Stab.prototype.setDistance = function(distance) { this._distance = distance; };
 
 /**
  * Returns the private property mass

@@ -53,7 +53,7 @@ function buildLes() {
 		lengths: lengths,
 		rightHand: rightHand
 	};
-};
+}
 
 function insertIntoMatrix(s,stab,matrix) {
 	'use strict';
@@ -84,4 +84,4 @@ function solveLes(A, b) {
 	var y = L.forwardSubstitution(b);
 	var x = R.backwardSubstitution(y);
 	return x;
-};
+}

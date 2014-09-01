@@ -5,15 +5,15 @@
 //                      [4,16,64,256],
 //                      [5,25,125,625] ]);
 function Matrix(ary) {
-	'use strict';
-    this.mtx    = ary
+    'use strict';
+    this.mtx    = ary;
     this.height = ary.length;
     this.width  = Array.isArray(ary[0]) ? ary[0].length : 1;
 }
  
 Matrix.prototype.toString = function() {
-	'use strict';
-    var s = []
+    'use strict';
+    var s = [];
     for (var i = 0; i < this.mtx.length; i++) {
 				if (Array.isArray(this.mtx[i])) {
 					s.push( this.mtx[i].join(",") );
@@ -24,7 +24,7 @@ Matrix.prototype.toString = function() {
 				}
 		}
     return s.join("\n");
-}
+};
 
 Matrix.prototype.copy = function() {
 	'use strict';
@@ -36,7 +36,7 @@ Matrix.prototype.copy = function() {
 			}
 		}
 		return new Matrix(c);
-}
+};
  
 // returns a new matrix
 Matrix.prototype.transpose = function() {
@@ -49,16 +49,18 @@ Matrix.prototype.transpose = function() {
         }
     }
     return new Matrix(transposed);
-}
+};
 
 Matrix.prototype.mult = function(other) {
 	'use strict';
 	// TODO: Sanitinzing
+	var result;
+	var i, j, sum;
 	if (isNumber(other)) { // Matrix * Number
-		var result = new Array(this.height);
-		for (var i = 0; i < this.height; i++) {
+		result = new Array(this.height);
+		for (i = 0; i < this.height; i++) {
 			result[i] = new Array(this.width);
-			for (var j = 0; j < this.width; j++) {
+			for (j = 0; j < this.width; j++) {
 				result[i][j] = trunc(this.mtx[i][j] * other);
 			}
 		}
@@ -67,10 +69,10 @@ Matrix.prototype.mult = function(other) {
 		if (this.width != other.length) {
 			throw new Error("Incompatible Sizes!");
 		}
-		var result = new Array(this.height);
-		for (var i = 0; i < this.height; i++) {
-				var sum = 0;
-				for (var j = 0; j < other.length; j++) {
+		result = new Array(this.height);
+		for (i = 0; i < this.height; i++) {
+				sum = 0;
+				for (j = 0; j < other.length; j++) {
 						sum += this.mtx[i][j] * other[j];
 				}
 				result[i] = trunc(sum);
@@ -81,13 +83,13 @@ Matrix.prototype.mult = function(other) {
 		if (this.width != other.height) {
 			throw new Error("Incompatible Sizes!");
 		}
-		var result = new Array(this.height);
+		result = new Array(this.height);
 		//console.log(this.height + 'x' + this.width,'*',
 		//		   other.height + 'x' + other.width);
-		for (var i = 0; i < this.height; i++) {
+		for (i = 0; i < this.height; i++) {
 			result[i] = new Array(other.width);
-			for (var j = 0; j < other.width; j++) {
-				var sum = 0;
+			for (j = 0; j < other.width; j++) {
+				sum = 0;
 				//console.log('Multiplying ' + (i+1) + 'th row with ' +
 				//(j+1) + 'th col');
 				for (var k = 0; k < this.width; k++) {				
@@ -103,7 +105,7 @@ Matrix.prototype.mult = function(other) {
 		}
 		return new Matrix(result); 
 	}	
-}
+};
 
 Matrix.prototype.add = function(other) {
 	'use strict';
@@ -118,7 +120,7 @@ Matrix.prototype.add = function(other) {
 		}
 	}
 	return new Matrix(result); 
-}
+};
 
 Matrix.prototype.minus = function(other) {
 	'use strict';
@@ -133,7 +135,7 @@ Matrix.prototype.minus = function(other) {
 		}
 	}
 	return new Matrix(result); 
-}
+};
 
 Matrix.diag = function(diagEl) {
 	'use strict';
@@ -149,7 +151,7 @@ Matrix.diag = function(diagEl) {
 				}
 		}
 		return new Matrix(result);
-}
+};
 
 Matrix.eyes = function(len) {
 	'use strict';
@@ -158,7 +160,7 @@ Matrix.eyes = function(len) {
 		eyesEl[i] = 1;
 	}
 	return new Matrix.diag(eyesEl);
-}
+};
 
 Matrix.fill = function(width, height, value) {
 	'use strict';
@@ -170,7 +172,7 @@ Matrix.fill = function(width, height, value) {
 		}
 	}
 	return new Matrix(result);
-}
+};
 
 Matrix.prototype.replace = function(origin, alternative) {
 	'use strict';
@@ -183,7 +185,7 @@ Matrix.prototype.replace = function(origin, alternative) {
 		}
 	}
 	return result;
-}
+};
 
 Matrix.prototype.lr = function() {
 	'use strict';
@@ -194,7 +196,7 @@ Matrix.prototype.lr = function() {
 	// FIXME: Truncat das not work, that is, divident still near zero
 	for (var i = 0; i < n-1; i++) {
 		for (var k = i+1; k < n; k++) {
-			if (r.mtx[i][i] == 0) {
+			if (r.mtx[i][i] === 0) {
 				//console.log(r.replace(0,'     ').toString());
 				throw new Error("Cannot divide through zero at (" + i + ", " + i + ')!');
 			}
@@ -210,8 +212,8 @@ Matrix.prototype.lr = function() {
 	return {
 		l: l,
 		r: r
-	}
-}
+	};
+};
 
 Matrix.prototype.det = function() {
 	'use strict';
@@ -223,7 +225,7 @@ Matrix.prototype.det = function() {
 		det *= r.mtx[i][i];
 	}
 	return det;
-}
+};
  
 Matrix.prototype.forwardSubstitution = function(vector) {
 	'use strict';
@@ -241,7 +243,7 @@ Matrix.prototype.forwardSubstitution = function(vector) {
 			result[i] = trunc((vector[i] - sum) / this.mtx[i][i]);
 	}
 	return result;
-}
+};
 
 Matrix.prototype.backwardSubstitution = function (vector) {
 	'use strict';

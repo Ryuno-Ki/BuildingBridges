@@ -11,7 +11,7 @@ Array.prototype.mult = function(other) {
 		this[i] *= other;
 	}
 	return this;
-}
+};
 
 Array.prototype.plus = function(other) {
 	'use strict';
@@ -26,7 +26,7 @@ Array.prototype.plus = function(other) {
 		this[i] += other[i];
 	}
 	return this;
-}
+};
 
 Array.prototype.minus = function(other) {
 	'use strict';
@@ -37,7 +37,7 @@ Array.prototype.minus = function(other) {
 		this[i] -= other[i];
 	}
 	return this;
-}
+};
 
 Array.prototype.scalarProduct = function(other) {
 	'use strict';
@@ -54,12 +54,12 @@ Array.prototype.scalarProduct = function(other) {
 		result += this[i] * other[i];
 	}
 	return result;
-}
+};
 
 Array.prototype.norm = function() {
 	'use strict';
 	return Math.pow(this.scalarProduct(this), 1/2);
-}
+};
 
 Array.prototype.normalise = function() {
 	'use strict';
@@ -69,7 +69,7 @@ Array.prototype.normalise = function() {
 		result[i] = this[i]/n;
 	}
 	return result;
-}
+};
 
 Array.prototype.cosine = function(other) {
 	'use strict';
@@ -78,5 +78,5 @@ Array.prototype.cosine = function(other) {
 	}
 
 	return (this.scalarProduct(other))/(this.norm() * other.norm());
-}
+};
 // http://javascript.crockford.com/prototypal.html

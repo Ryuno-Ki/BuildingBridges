@@ -7,7 +7,7 @@ Math.min = function() {
 	} else {
 		return standardMin(arguments[0]);
 	}
-}
+};
 
 // credits: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/
 //					Global_Objects/Math/round#Example:_Decimal_rounding
@@ -70,19 +70,19 @@ function handleFileSelection() {
 
 	waitForTextReadComplete(reader);
     	reader.readAsText(file);
-};
+}
 
 // kudos to https://stackoverflow.com/a/1830844
 function isNumber(n) {
 	'use strict';
 	return !isNaN(parseFloat(n)) && isFinite(n);
-};
+}
 
 function trunc(n) {
 	'use strict';
 	var p = 7;
 	return Math.round10(n, -1*p);
-};
+}
 
 // http://mspr0.de/?feed=rss2
 // http://feeds.feedburner.com/Ctrlverlust
