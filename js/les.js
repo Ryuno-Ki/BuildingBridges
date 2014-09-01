@@ -1,37 +1,53 @@
-function buildLes() {
-	// E   … Equationmatrix, E € IR^(16x18)
-	// f   … force, f € IR^18, f_k > 0 => Zugkraft, f_k < 0 => Druckkraft
-	// p   … external powers, p € IR^16
-	// x   … verschiebungsvektor
-	// n   … Young'sches Elastizitätsmodul
-	// d_k … deformation for k-th stab
-	// l_k … length of k-th stab
-	// L   … matrix (l_kk), k = 1…18
-	// A   … Steifigkeitsmatrix
-	// p = E*f
-	// p = A*x with A = n*E*L^(-1)*E+
-	// f_k = n*d_k/l_k
+function mainLes() {
+    'use strict';
+    var prepare = buildLes();
+    var elasticity = document.getElementById('elasticity').value;
+    var matrix = prepare.matrix.mult(prepare.lengths).mult(prepare.matrix.transpose()).mult(elasticity);
+    var shift = solveLes(matrix, prepare.rightHand);
+    // TODO: Idea: adopt b.lager, b.staebe[n].leftEnd and .rightEnd
+    //             and just adjust the values in solution[x],
+    //             solution[y] to the values, the gelenke would have.
+    //             Then paint another bridge over the first one, in
+    //             red. This may yield to just another change in the
+    //             callback chain to pass b as argument
+    
+    for (var g = 0; g < b.gelenke.length; g++) {
+        var current = b.gelenke[g];
+        current.setX(current.getX() + shift[2*g]);
+        current.setY(current.getY() + shift[2*g+1]);
+    }
+    produceXml(b);
+    updateCanvas('#FF0000');
+}
 
-	var mass      = 1; // FIXME: Read from list
-	var gravity   = 8.91; // FIXME: Read from site
+function buildLes() {
+	'use strict';
+
+	var gravity   = document.getElementById('gravity').value;
 	var matrix    = new Matrix.fill(18,16,0);
 	var lengths   = new Array(b.stab.length);
-	var rightHand = new Matrix.fill(1,16,0);
+	var rightHand = new Array(16);
 	var stab      = b.stab;
+	
 	for (var s = 0; s < stab.length; s++) {
 		var current = stab[s];
 		matrix = insertIntoMatrix(s,current,matrix).copy();
 	}
 	
 	for (var l = 0; l < b.stab.length; l++) {
-		lengths[l] = 1/b.stab[l].getDistance();
+		lengths[l] = trunc(1/b.stab[l].getDistance());
 	}
 	
-	for (var r = 1; r < rightHand.height; r += 2) {
-		rightHand.mtx[r] = mass * gravity;
+	for (var r = 0; r < rightHand.length; r++) {
+		var ind = (r-1)/2;
+		if (b.gelenke[ind]) {
+			rightHand[r] = b.gelenke[ind].getMass() * gravity;
+		} else {
+			rightHand[r] = 0;
+		}
 	}
-	console.log(matrix.replace(0, '     ').toString());
 	lengths = Matrix.diag(lengths);
+	console.log(matrix.replace(0, '     ').toString());
 	return {
 		matrix: matrix,
 		lengths: lengths,
@@ -40,6 +56,7 @@ function buildLes() {
 };
 
 function insertIntoMatrix(s,stab,matrix) {
+	'use strict';
 	var result = matrix.copy();
 	var left   = parseInt(stab.leftEnd);
 	var right  = parseInt(stab.rightEnd);
@@ -58,24 +75,13 @@ function insertIntoMatrix(s,stab,matrix) {
 	return result;
 }
 
-function solveLes() {
-	var preface = buildLes();
-	var matrix = preface.matrix;
-	var lengths   = preface.lengths;
-	var b = preface.rightHand;
-	var A = matrix.mult(lengths).mult(matrix.transpose());
+function solveLes(A, b) {
+	'use strict';
+    // Solving A*x = b for x
 	var part = A.lr();
 	var R = part.r;
 	var L = part.l;
-	y = L.forwardSubstitution(b);
-	x = R.backwardSubstitution(y);
-	//console.log(result.mult(x).toString());
-	//paint in red and write to file
-	console.log(A.mult(x).toString());
-	console.log(b.toString());
-	return result;
+	var y = L.forwardSubstitution(b);
+	var x = R.backwardSubstitution(y);
+	return x;
 };
-
-function toArray(element) {
-	return [element.getX(), element.getY()];
-}

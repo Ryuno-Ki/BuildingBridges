@@ -18,6 +18,10 @@ Array.prototype.plus = function(other) {
 	if (!Array.isArray(other)) {
 		throw new Error("Not compatible!");
 	}
+	if (this.length != other.length) {
+		throw new Error("Not compatible!");
+	}
+
 	for (var i = 0; i < this.length; i++) {
 		this[i] += other[i];
 	}

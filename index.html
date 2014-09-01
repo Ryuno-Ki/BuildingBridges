@@ -34,6 +34,14 @@
       .right-pane ol, .right-pane ul {
         float: left;
       }
+      
+      #elastic, #gravis {
+        width: 50%;
+      }
+        
+      #elastic input, #gravis input {
+        float: right;
+      }
     </style>
 		<script src="js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
   </head>
@@ -50,22 +58,26 @@
 			<p id='coords'>
 			  <input id="type" type="hidden" value="lager" />
 				<label for="x-coord">x:</label>
-				<input id="x-coord" placeholder="1" step="1" min="1" max="320" type="number" autofocus required />
+				<input id="x-coord" value="1" step="1" min="1" max="320" type="number" autofocus required />
 				<label for="y-coord">y:</label>
-				<input id="y-coord" placeholder="1" step="1" min="1" max="320" type="number" required />
+				<input id="y-coord" value="1" step="1" min="1" max="320" type="number" required />
 				<button type="button" id="submit-coords">Speichern</button>
 				</p>
-				<p>
+				<p id="gravis">
 				<label for="gravity">Schwerkraft:</label>
-				<input id="gravity" type="number" value="9.81" min="0" />
+				<input id="gravity-range" type="range" value="9.81" min="3" max="25" />
+				<input id="gravity" type="number" value="9.81" min="3" max="25" />
+				</p>
+				<p id="elastic">
 				<label for="elasticity">Elastizitätsmodul</label>
+				<input id="elasticity-range" type="range" value="130" min="1" max="1000" /><!-- invar -->
 				<input id="elasticity" type="number" value="130" min="1" max="1000" /><!-- invar -->
 			</p>
 			<p id='staebe-input'>
 			</p>
 		</div>
 		<div class='right-pane'>
-      <h2 id='saved-values'>Gespeicherte Werte</h2>
+      <h2 id='saved-values' style="visibility:hidden;">Gespeicherte Werte</h2>
 			<ol id="lager" start="0">
 			</ol>
       <ol id="gelenke" start="0">
@@ -73,7 +85,10 @@
       <ul id="staebe">
       </ul>
     </div>
+    <div id="output"></div>
 	<script src="js/monkeypatch.js"></script>
+	<script src="js/matrix.js"></script>
+	<script src="js/vector.js"></script>
     <script src="js/les.js"></script>
     <script src="js/bridge-elements.js"></script>
     <script src="js/bridges.js"></script>	

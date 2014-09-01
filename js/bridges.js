@@ -15,27 +15,33 @@
 var b = new Bridge();
 document.addEventListener('DOMContentLoaded', init, false);
 
-// FIXME: Put into Bridge namespace
+/**
+ * @todo Wrap this function into Bridge namespace
+ */
 function init() {
-	//var gelenkBtn = document.getElementById('add-gelenk');
 	var canvas         = document.getElementById('bridge');
 	var fileChooser    = document.getElementById('fileChooser');
 	var coords         = document.getElementById('coords');
 	var coordsBtn      = document.getElementById('submit-coords');
 	var gelenkeEl      = document.getElementById('gelenke');
+	var elasticity     = document.getElementById('elastic');
+	var gravity        = document.getElementById('gravis');
 	var isMobileDevice = navigator.userAgent.match(/ipad|iphone|ipod|android/i);
+
 	if (isMobileDevice) {
 		gelenkBtn.addEventListener('mousedown', addCoordinates, false);
 		canvas.addEventListener('mousedown', getPosition, false);
 	} else {
 		canvas.addEventListener('click', function(e) {
 			pnt = getPosition(e);
-			updateCanvas(pnt.x, pnt.y);
+	    		clearCanvas();
+			updateCanvas(undefined, pnt.x, pnt.y);
 		}, false);
 		coords.addEventListener('keyup', function() {
 			x = document.getElementById('x-coord').value;
 			y = document.getElementById('y-coord').value;
-			updateCanvas(x, y);
+	    		clearCanvas();
+			updateCanvas(undefined, x, y);
 		}, false);
 	};
 	// Both
@@ -43,6 +49,7 @@ function init() {
 	coordsBtn.addEventListener('click', function() {
 		x    = document.getElementById('x-coord').value;
 		y    = document.getElementById('y-coord').value;
+		m    = document.getElementById('gravity').value;
 		type = document.getElementById('type').value;
 		if (type == 'lager') {
 			l = new Lager();
@@ -57,21 +64,43 @@ function init() {
 			if (b.gelenke.length >= 0) {
 				g.setX(x);
 				g.setY(y);
+				g.setMass(m);
 				b.addToList(g);
 				printCoordinates();
 			}
 		}
+		clearCanvas();
 		updateCanvas();
 	}, false);
-	//gelenkBtn.addEventListener('submit',    addCoordinates, false);
-	//gelenkeEl.addEventListener('click', buildBridge, false);
+	elasticity.addEventListener('change', function(e) {
+		// Keep range in sync with numeric input
+		switch(e.target.id) {
+			case 'elasticity':
+				document.getElementById('elasticity-range').value = e.target.value;
+				break;
+			case 'elasticity-range':
+				document.getElementById('elasticity').value = e.target.value;
+				break;
+		}
+	}, false);
+	gravity.addEventListener('change', function(e) {
+		// Keep range in sync with numeric input
+		switch(e.target.id) {
+			case 'gravity':
+				document.getElementById('gravity-range').value = e.target.value;
+				break;
+			case 'gravity-range':
+				document.getElementById('gravity').value = e.target.value;
+				break;
+		}
+	}, false);
 };
 
-function updateCanvas(x,y) {
-	clearCanvas();
+function updateCanvas(colour,x,y) {
 	var canvas       = document.getElementById('bridge');
 	var xCoord       = document.getElementById('x-coord');
 	var yCoord       = document.getElementById('y-coord');
+    console.log('CHECKING',colour,x,y);
 	if (x != "" && y != "") {
 		showCircle(x,y);
 		xCoord.value = x;
@@ -90,7 +119,7 @@ function updateCanvas(x,y) {
 			} else {
 				drawRect(currentX, currentY, distToRight, distToBottom);
 			}
-			annotate('Lager ' + l, current);
+			//annotate('Lager ' + l, current);
 			/*
 			// Adjustment lines to keep values inside the box
 			drawLine(0, currentY, canvas.width, currentY, true);
@@ -104,7 +133,7 @@ function updateCanvas(x,y) {
 	if (b.gelenke.length) {
 		for (var g = 0; g < b.gelenke.length; ++g) {
 			var current = b.gelenke[g];
-			drawCircle(current.getX(), current.getY());
+			drawCircle(current.getX(), current.getY(), colour);
 		}
 	}
 	if (b.stab.length) {
@@ -112,7 +141,7 @@ function updateCanvas(x,y) {
 			var current = b.stab[s];
 			var left    = current.leftEnd < 2 ? b.lager[current.leftEnd] : b.gelenke[current.leftEnd-2];
 			var right   = current.rightEnd < 2 ? b.lager[current.rightEnd] : b.gelenke[current.rightEnd-2];
-			drawLine(left.getX(), left.getY(), right.getX(), right.getY());
+			drawLine(left.getX(), left.getY(), right.getX(), right.getY(), colour);
 		}
 	}
 }
@@ -131,7 +160,7 @@ function updateInputField() {
 		lLabel.appendChild(document.createTextNode('left:'));
 		var l         = document.createElement('input');
 		l.id          = 'left';
-		l.placeholder = '0';
+		l.value       = '0';
 		l.type        = 'number';
 		l.min         = '0';
 		l.step        = '1';
@@ -140,7 +169,7 @@ function updateInputField() {
 		rLabel.appendChild(document.createTextNode('right:'));
 		var r         = document.createElement('input');
 		r.id          = 'right';
-		r.placeholder = '0';
+		r.value       = '0';
 		r.type        = 'number';
 		r.min         = '0';
 		r.step        = '1';
@@ -159,7 +188,7 @@ function updateInputField() {
 		staebe.appendChild(saveBtn);
 		prnt.appendChild(calcBtn);
 		
-		calcBtn.addEventListener('click', solveLes, false);
+		calcBtn.addEventListener('click', mainLes, false);
 		/*
 		stabBtn.addEventListener('click', buildDistanceMatrix, false);
 		stabBtn.addEventListener('click', buildBridge, false);
@@ -246,13 +275,13 @@ function showCircle(x,y) {
   drawingContext.stroke();
 }
 
-function drawCircle(x,y) {
+function drawCircle(x,y, colour) {
 	var r = 3;
   var bridge = document.getElementById('bridge');
   var drawingContext = bridge.getContext('2d');
   drawingContext.beginPath();
   drawingContext.arc(x, y, r, Math.PI*2, 0, true);
-  drawingContext.fillStyle = '#444444';
+  drawingContext.fillStyle = colour || '#444444';
   drawingContext.fill();
   drawingContext.closePath();
   
@@ -266,7 +295,7 @@ function annotate(text, el) {
 	drawingContext.fillText(text, el.getX()+5, el.getY()-5);
 }
 
-function drawLine(x1, y1, x2, y2, dashed) {
+function drawLine(x1, y1, x2, y2, dashed, colour) {
   console.log('Drawing: (' + x1 + ', ' + y1 + ') to (' + x2 + ', ' + y2 + ')');
   var bridge = document.getElementById('bridge');
   var drawingContext = bridge.getContext('2d');
@@ -277,6 +306,7 @@ function drawLine(x1, y1, x2, y2, dashed) {
 	if (dashed) {
 		drawingContext.setLineDash([10]);
 	}
+  drawingContext.fillStyle = colour || 'black';
   drawingContext.moveTo(x1, y1);
   drawingContext.lineTo(x2, y2);
   drawingContext.stroke();
@@ -299,6 +329,7 @@ function clearCanvas() {
 	var bridge = document.getElementById('bridge');
 	var drawingContext = bridge.getContext('2d');
 	drawingContext.clearRect(0, 0, bridge.width, bridge.height);
+    // TODO: Alternatively set context.width to itself
 }
 
 function buildDistanceMatrix() {
@@ -332,11 +363,13 @@ function waitForTextReadComplete(reader) {
 		var text   = event.target.result;
 		var step   = document.getElementById('step');
 		var coords = document.getElementById('coords');
+		var staebe = document.getElementById('staebe-input');
 		
 		parseTextAsXml(text);
 		// Dismiss the manually input.
 		step.style.display   = 'none';
 		coords.style.display = 'none';
+		staebe.style.display = 'none';
 	}
 }
 
@@ -346,25 +379,101 @@ function consumeXml(xml) {
     for (var l = 0; l < bridgeDom.childNodes.length; ++l) {
 	    var liX = bridgeDom.childNodes[l].childNodes[0].getAttribute('x');
 	    var liY = bridgeDom.childNodes[l].childNodes[0].getAttribute('y');
+	    var liMass = bridgeDom.childNodes[l].childNodes[0].getAttribute('mass');
 	    var leftEnd = bridgeDom.childNodes[l].childNodes[0].getAttribute('leftEnd');
 	    var rightEnd = bridgeDom.childNodes[l].childNodes[0].getAttribute('rightEnd');
-			if (bridgeDom.childNodes[l].nodeName == 'lager') {
+		if (bridgeDom.childNodes[l].nodeName == 'lager') {
 	    	var lager = new Lager();
 		    lager.setX(liX);
 		    lager.setY(liY);
-	  	  b.addToList(lager);
-			} else if (bridgeDom.childNodes[l].nodeName == 'gelenk') {
+            b.addToList(lager);
+		} else if (bridgeDom.childNodes[l].nodeName == 'gelenk') {
 	    	var gelenk = new Gelenk();
 		    gelenk.setX(liX);
 		    gelenk.setY(liY);
-	  	  b.addToList(gelenk);
-			} else if (bridgeDom.childNodes[l].nodeName == 'stange') {
-		var stange = new Stab();
+		    gelenk.setMass(liMass);
+            b.addToList(gelenk);
+		} else if (bridgeDom.childNodes[l].nodeName == 'stange') {
+            var stange = new Stab();
 		    stange.leftEnd = leftEnd;
 		    stange.rightEnd = rightEnd;
+            stange.setMass(liMass);
 		    b.addToList(stange);
-			}
+		}
     }
     updateCanvas();
     printCoordinates();
+}
+
+function produceXml(bridge) {
+    'use strict';
+    var children = '';
+    for (var l = 0; l < bridge.lager.length; l++) {
+        var details = createClosedXmlTag('details', {
+            'mass': 0,
+            'x': bridge.lager[l].getX(),
+            'y': bridge.lager[l].getY()
+        });
+        var lager = createXmlTag('lager', details);
+        children += lager;
+    }
+    for (var g = 0; g < bridge.gelenke.length; g++) {
+        var details = createClosedXmlTag('details', {
+            'mass': bridge.gelenke[g].getMass(),
+            'x': bridge.gelenke[g].getX(),
+            'y': bridge.gelenke[g].getY()
+        });
+        var gelenk = createXmlTag('gelenk', details);
+        children += gelenk;
+    }
+    for (var s = 0; s < bridge.stab.length; s++) {
+        var details = createClosedXmlTag('details', {
+            'mass': bridge.stab[s].getMass(),
+            'leftEnd': bridge.stab[s].leftEnd,
+            'rightEnd': bridge.stab[s].rightEnd
+        });
+        var stab = createXmlTag('stange', details);
+        children += stab;
+    }
+    var bridgeXml = createXmlTag('bridge', children);
+   
+    var output = document.getElementById('output');
+    var textarea = document.createElement('textarea');
+    textarea.cols = "35";
+    textarea.rows = "58";
+    textarea.readOnly = 'readonly';
+    textarea.style.overflow = 'hidden';
+    textarea.value = bridgeXml;
+    output.appendChild(textarea);
+    return bridgeXml;
+}
+
+function createXmlTag(name, children, attributes) {
+    'use strict';
+    var tag = '<' + name;
+    if (attributes) {
+        for (var attrKey in attributes) {
+            tag += ' ' + attrKey + '="' + attributes[attrKey] + '"';
+        }
+    }
+    tag += '>';
+    
+    if (children) {
+        tag += children;
+    }
+    
+    tag += '</' + name + '>';
+    return tag;
+}
+
+function createClosedXmlTag(name, attributes) {
+    'use strict';
+    var tag = '<' + name;
+    if (attributes) {
+        for (var attrKey in attributes) {
+            tag += ' ' + attrKey + '="' + attributes[attrKey] + '"';
+        }
+    }
+    tag += ' />';
+    return tag;
 }

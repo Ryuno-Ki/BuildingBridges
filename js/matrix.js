@@ -64,6 +64,9 @@ Matrix.prototype.mult = function(other) {
 		}
 		return new Matrix(result);
 	} else if (Array.isArray(other)) { // Matrix * Array
+		if (this.width != other.length) {
+			throw new Error("Incompatible Sizes!");
+		}
 		var result = new Array(this.height);
 		for (var i = 0; i < this.height; i++) {
 				var sum = 0;
@@ -75,9 +78,12 @@ Matrix.prototype.mult = function(other) {
 		return result;
 	} else { // Matrix * Matrix
 		// width = #cols, height = #rows
+		if (this.width != other.height) {
+			throw new Error("Incompatible Sizes!");
+		}
 		var result = new Array(this.height);
-		console.log(this.height + 'x' + this.width,'*',
-				   other.height + 'x' + other.width);
+		//console.log(this.height + 'x' + this.width,'*',
+		//		   other.height + 'x' + other.width);
 		for (var i = 0; i < this.height; i++) {
 			result[i] = new Array(other.width);
 			for (var j = 0; j < other.width; j++) {
@@ -97,6 +103,21 @@ Matrix.prototype.mult = function(other) {
 		}
 		return new Matrix(result); 
 	}	
+}
+
+Matrix.prototype.add = function(other) {
+	'use strict';
+	if (this.width != other.width || this.height != other.height) {
+		throw new Error("Incompatible sizes!");
+	}
+	var result = new Array(this.height);
+	for (var i = 0; i < this.height; i++) {
+		result[i] = new Array(other.width);
+		for (var j = 0; j < other.width; j++) {
+		result[i][j] = trunc(this.mtx[i][j] + other.mtx[i][j]);
+		}
+	}
+	return new Matrix(result); 
 }
 
 Matrix.prototype.minus = function(other) {
