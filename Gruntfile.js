@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     watch: {
       scripts: {
         files: ['js/*.js','test/spec/*.js'],
-        tasks: ['jshint','jsdoc','jasmine', 'jasmine:pivotal:build'],
+        tasks: ['jshint','jsdoc','jasmine:coverage','jasmine:pivotal:build'],
       },
     },
     jshint: {
@@ -45,13 +45,16 @@ module.exports = function(grunt) {
 	  specs: 'test/spec/*Spec.js',
 	  helpers: 'test/spec/*Helper.js',
 	  outfile: 'test/SpecRunner.html',
-	  keepRunner: true
+	  keepRunner: true,
+	  display: 'full'
         }
       },
       coverage: {
         src: 'js/*.js',
+	files: ['js/*.js','!js/modernizr-2.6.2-respond-1.1.0.min.js'],
 	options: {
 	  specs: 'test/spec/*Spec.js',
+	  display: 'full',
           template: require('grunt-template-jasmine-istanbul'),
 	  templateOptions: {
 	    coverage: 'bin/coverage/coverage.json',
@@ -88,7 +91,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['jshint','uglify','watch']);
-  grunt.registerTask('dev', ['notify_hooks','jshint', 'jasmine','watch']);
+  grunt.registerTask('dev', ['notify_hooks','watch']);
   grunt.registerTask('test', ['jshint', 'jasmine']);
   grunt.registerTask('test:coverage', ['jasmine:coverage']);
 };
