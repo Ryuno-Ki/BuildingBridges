@@ -1,4 +1,7 @@
 describe("Matrix", function() {
+	var A, B, C; // Matrices
+	var x, y, z; // Vectors
+	var s, As, xs; // Scalars
 	describe("string representation", function() {
 		it("should put a String containing the values of matrix", function() {
 			A = new Matrix.eyes(3);
@@ -34,6 +37,9 @@ describe("Matrix", function() {
 
 	describe("LR-decomposition", function() {
 		it("should compute the LR decomposition", function() {
+			// A*x = b whereby A = L*R
+			// 1.) forwardSubstitution with L and b yields y = R*x
+			// 2.) backwardSubstitution with R and y yields x
 			A = new Matrix([ [1,7,8],[2,15,25],[3,25,61] ]);
 			L = new Matrix([ [1,0,0],[2,1,0],[3,4,1] ]);
 			R = new Matrix([ [1,7,8],[0,1,9],[0,0,1] ]);
@@ -43,23 +49,23 @@ describe("Matrix", function() {
 
 		it("should compute a forward substitution", function() {
 			L = new Matrix([ [1,0,0],[2,1,0],[3,4,1] ]);
-			x = [0,0,1];
-			expect(L.forwardSubstitution(x)).toEqual([0,0,1]);
+			b = [0,0,1];
+			expect(L.forwardSubstitution(b)).toEqual([0,0,1]);
 		});
 
 		it("should compute a backward substitution", function() {
 			R = new Matrix([ [1,7,8],[0,1,9],[0,0,1] ]);
-			x = [0,0,1];
-			expect(R.backwardSubstitution(x)).toEqual([55,-9,1]);
+			y = [0,0,1];
+			expect(R.backwardSubstitution(y)).toEqual([55,-9,1]);
 		});
 
 		it("should test the results", function() {
-			A = new Matrix([ [1,2,3],[4,5,6],[7,8,9] ]);
+			A = new Matrix([ [1,7,8],[2,15,25],[3,25,61] ]);
 			lr = A.lr();
 			y = lr.l.forwardSubstitution([0,0,1]);
 			x = lr.r.backwardSubstitution(y);
 
-			expect(A.mult([55,-9,1])).toEqual(x);
+			expect(A.mult(x)).toEqual([0,0,1]);
 		});	
 
 		// TODO: Provoke the Errors
@@ -106,7 +112,7 @@ describe("Matrix", function() {
 			expect(A.det()).toEqual(24);
 		});
 
-		it("should return null for singular matrix", function() {
+		it("should return zero for singular matrix", function() {
 			A = new Matrix([ [0,2,3],[0,4,5],[0,0,6] ]);
 			expect(A.det()).toEqual(0);
 		});

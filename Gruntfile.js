@@ -1,8 +1,15 @@
 module.exports = function(grunt) {
+'use strict';
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    meta: {
+      src: 'js/*.js',
+      specs: 'test/specs/*Spec.js',
+      helpers: 'test/helpers/*Helper.js'.
+      fixtures: 'test/fixtures/*Helper.js'
+    },
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
@@ -14,18 +21,18 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: ['js/*.js','test/spec/*.js'],
+        files: ['<%= meta.src %>','<%= meta.specs %>'],
         tasks: ['jshint','jsdoc','jasmine:coverage','jasmine:pivotal:build'],
       },
     },
     jshint: {
-      all: ['Gruntfile.js','js/*.js'],
+      all: ['Gruntfile.js','<%= meta.src %>'],
       force: 'true',
       jshintrc: 'true'
     },
     jsdoc: {
       dist : {
-        src: ['js/*.js', 'test/*.js'], 
+        src: ['<%= meta.src %>'], 
         options: {
           destination: 'doc/',
 	  private: true
@@ -40,20 +47,21 @@ module.exports = function(grunt) {
     },
     jasmine: {
       pivotal: {
-        src: 'js/*.js',
+        src: '<%= meta.src %>',
         options: {
-	  specs: 'test/spec/*Spec.js',
-	  helpers: 'test/spec/*Helper.js',
+	  specs: '<%= meta.specs %>',
+	  helpers: '<%= meta.helpers %>',
 	  outfile: 'test/SpecRunner.html',
 	  keepRunner: true,
 	  display: 'full'
-        }
+        },
+        vendor: ['node_modules/jquery/dist/jquery.min.js']
       },
       coverage: {
-        src: 'js/*.js',
-	files: ['js/*.js','!js/modernizr-2.6.2-respond-1.1.0.min.js'],
+        src: '<%= meta.src %>',
+	files: ['<%= meta.src %>','!js/modernizr-2.6.2-respond-1.1.0.min.js'],
 	options: {
-	  specs: 'test/spec/*Spec.js',
+	  specs: '<%= meta.specs %>',
 	  display: 'full',
           template: require('grunt-template-jasmine-istanbul'),
 	  templateOptions: {

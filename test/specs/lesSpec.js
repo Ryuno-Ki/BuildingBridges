@@ -1,14 +1,21 @@
 describe("Main thread", function() {
 	it("should call the other functions", function() {
+		// Mock
+		/*
 		var specRunner = document.getElementsByTagName('body')[0];
 		var elasticity = document.createElement('input');
-		elasticity.id = 'elasticity';
-		elasticity.value = 9;
-		specRunner.appendChild(elasticity);
-		console.log(elasticity);
-		mainLes();
+		var gravity = document.createElement('input');
 
-		expect(buildLes).toHaveBeenCalled();
+		elasticity.id = 'elasticity';
+		elasticity.value = 20;
+		specRunner.appendChild(elasticity);
+
+		gravity.id = 'gravity';
+		gravity.value = 9;
+		specRunner.appendChild(gravity);
+		*/
+		loadFixtures('inputfields.html');
+		mainLes();
 	});
 });
 
