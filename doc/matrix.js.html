@@ -112,9 +112,19 @@ Matrix.prototype.transpose = function() {
     return new Matrix(transposed);
 };
 
+/**
+ * Multiply a matrix with a number, an array or another matrix
+ * @todo Sanitizing
+ * @memberOf Matrix
+ * @this Matrix
+ * @method mult
+ * @instance
+ * @param {Number|Array|Matrix} other - The other factor
+ * @throws "Incompatible Sizes!" - if the dimensions does not match
+ * @return {Matrix|Array} result - The calculated result
+ */
 Matrix.prototype.mult = function(other) {
     'use strict';
-    // TODO: Sanitinzing
     var result;
     var i, j, sum;
     if (isNumber(other)) { // Matrix * Number
@@ -126,6 +136,7 @@ Matrix.prototype.mult = function(other) {
             }
         }
         return new Matrix(result);
+
     } else if (Array.isArray(other)) { // Matrix * Array
         if (this.width != other.length) {
             throw new Error("Incompatible Sizes!");
@@ -139,6 +150,7 @@ Matrix.prototype.mult = function(other) {
                 result[i] = trunc(sum);
         }
         return result;
+
     } else { // Matrix * Matrix
         // width = #cols, height = #rows
         if (this.width != other.height) {
@@ -168,6 +180,16 @@ Matrix.prototype.mult = function(other) {
     }    
 };
 
+/**
+ * Adds another Matrix to this instance
+ * @memberOf Matrix
+ * @instance
+ * @method add
+ * @this Matrix
+ * @param {Matrix} other
+ * @throws "Incompatible sizes!" - if the height and width does not match
+ * returns {Matrix} result       - The sum of this and other
+ */
 Matrix.prototype.add = function(other) {
     'use strict';
     if (this.width != other.width || this.height != other.height) {
@@ -183,21 +205,34 @@ Matrix.prototype.add = function(other) {
     return new Matrix(result); 
 };
 
+
+/**
+ * Subtracts a matrix from another
+ * @memberOf Matrix
+ * @instance
+ * @method minus
+ * @this Matrix
+ * @param {Matrix} other
+ * @throws "Incompatible sizes!" - if the height and width does not match
+ * returns {Matrix} result       - The difference of this and other
+ */
 Matrix.prototype.minus = function(other) {
     'use strict';
     if (this.width != other.width || this.height != other.height) {
         throw new Error("Incompatible sizes!");
     }
-    var result = new Array(this.height);
-    for (var i = 0; i &lt; this.height; i++) {
-        result[i] = new Array(other.width);
-        for (var j = 0; j &lt; other.width; j++) {
-        result[i][j] = trunc(this.mtx[i][j] - other.mtx[i][j]);
-        }
-    }
-    return new Matrix(result); 
+    return new Matrix(this.add(other.mult(-1)));
 };
 
+/**
+ * Builds a diagonal matrix with given entries.
+ * @memberOf Matrix
+ * @method diag
+ * @this Matrix
+ * @param {Array} diagEl  - The diagonal elements
+ * @throws "Not an array" - if diagEl isn't an array.
+ * @returns {Matrix}      - A diagonal Matrix
+ */
 Matrix.diag = function(diagEl) {
     'use strict';
         if (!Array.isArray(diagEl)) {
@@ -214,6 +249,14 @@ Matrix.diag = function(diagEl) {
         return new Matrix(result);
 };
 
+/**
+ * Builds a diagonal matrix with '1' on main axis.
+ * @memberOf Matrix
+ * @method eyes
+ * @this Matrix
+ * @param {Array} len     - The diagonal elements
+ * @returns {Matrix}      - A diagonal Matrix with '1' on the main axis
+ */
 Matrix.eyes = function(len) {
     'use strict';
     var eyesEl = new Array(len);
@@ -223,18 +266,39 @@ Matrix.eyes = function(len) {
     return new Matrix.diag(eyesEl);
 };
 
+/**
+ * Builds a matrix of given dimensions with given entries
+ * @memberOf Matrix
+ * @method eyes
+ * @this Matrix
+ * @param {Number} width  - The width of the matrix.
+ * @param {Number} height - The height of the matrix.
+ * @param {Number} value  - The values of the matrix.
+ * @returns {Matrix}      - A filled Matrix
+ */
 Matrix.fill = function(width, height, value) {
     'use strict';
-    var result = new Array(height);
-    for (var i = 0; i &lt; height; i++) {
-        result[i] = new Array(width);
-        for (var j = 0; j &lt; width; j++) {
+    var result = new Array(width);
+    for (var i = 0; i &lt; width; i++) {
+        result[i] = new Array(height);
+        for (var j = 0; j &lt; height; j++) {
             result[i][j] = value;
         }
     }
     return new Matrix(result);
 };
 
+/**
+ * When aiming to prompt a Matrix to console.log() it is often helpfully to
+ * replace sparse entries with space.
+ * @memberOf Matrix
+ * @method replace
+ * @instance
+ * @this Matrix
+ * @param {Number} origin - The original value which is about to be replaced
+ * @param {String|Number} alternative - The replacement, often a string
+ * @returns {Matrix} result - A new Matrix with replaced values
+ */
 Matrix.prototype.replace = function(origin, alternative) {
     'use strict';
     var result = this.copy();
@@ -248,26 +312,30 @@ Matrix.prototype.replace = function(origin, alternative) {
     return result;
 };
 
+/**
+ * LR-decomposition for Matrix
+ * @memberOf Matrix
+ * @method lr
+ * @instance
+ * @this Matrix
+ * @throws "Cannot divide through zero!"
+ * @returns {object} - Holding two matrices, l and r, as keys
+ */
 Matrix.prototype.lr = function() {
     'use strict';
     var n = this.width;
     var l = new Matrix.eyes(n);
     var r = this.copy();
 
-    // FIXME: Truncat das not work, that is, divident still near zero
     for (var i = 0; i &lt; n-1; i++) {
         for (var k = i+1; k &lt; n; k++) {
             if (r.mtx[i][i] === 0) {
-                //console.log(r.replace(0,'     ').toString());
-                throw new Error("Cannot divide through zero at (" + i + ", " + i + ')!');
+                throw new Error("Cannot divide through zero!");
             }
             l.mtx[k][i] = r.mtx[k][i] / r.mtx[i][i];
             for (var j = i; j &lt; n; j++) {
                 r.mtx[k][j] = r.mtx[k][j] - l.mtx[k][i]*r.mtx[i][j];
-                //console.log('Rechts füllen: ',k,j);
             }
-            //console.log('Links füllen: ',k,i);
-            //console.log(l.mtx[k][i],trunc(l.mtx[k][i]),l.mtx[k][i]-trunc(l.mtx[k][i]));
         }
     }
     return {
@@ -276,10 +344,19 @@ Matrix.prototype.lr = function() {
     };
 };
 
+/**
+ * Calculates the determinant of a matrix through LR decomposition
+ * @todo Catch division by zero
+ * @memberOf Matrix
+ * @method det
+ * @instance
+ * @this Matrix
+ * @returns {Number} det - The calculated Number
+ */
 Matrix.prototype.det = function() {
     'use strict';
-    // FIXME: Division by zero isn't caught!
-    try { this.lr(); } catch(e) { return 0;    }
+    //try { this.lr(); } catch(e) { return 0;    }
+    lr = this.lr();
     var r = lr.r;
     var det = 1;
     for (var i = 0; i &lt; this.width; i++) {
@@ -288,10 +365,19 @@ Matrix.prototype.det = function() {
     return det;
 };
  
+/**
+ * Pursues forward substitution in order to solve a linear equation system
+ * @memberOf Matrix
+ * @method forwardSubstitution
+ * @instance
+ * @this Matrix
+ * @throws "Incompatible sizes!" - If vector length does not match Matrix width
+ * @returns {Array} result       - The first half of a solution
+ */
 Matrix.prototype.forwardSubstitution = function(vector) {
     'use strict';
     if (Array.isArray(vector) && this.width != vector.length) {
-        throw new Error("incompatible sizes!");
+        throw new Error("Incompatible sizes!");
     }
     var result = new Array(this.height);
     result[0] = vector[0]/this.mtx[0][0];
@@ -305,28 +391,32 @@ Matrix.prototype.forwardSubstitution = function(vector) {
     }
     return result;
 };
-
+ 
+/**
+ * Pursues backward substitution in order to solve a linear equation system
+ * @memberOf Matrix
+ * @method backwardSubstitution
+ * @instance
+ * @this Matrix
+ * @throws "Incompatible sizes!" - If vector length does not match Matrix width
+ * @returns {Array} result       - The first half of a solution
+ */
 Matrix.prototype.backwardSubstitution = function (vector) {
     'use strict';
     if (this.width != vector.length) {
-        throw new Error("incompatible sizes!");
+        throw new Error("Incompatible sizes!");
     }
 
     var mh = this.height;
     var result = new Array(mh);
     result[mh-1] = trunc(vector[mh-1]/this.mtx[mh-1][mh-1]);
-    console.log(this.replace(0,'                  ').toString());
-    //console.log(mh,mh-1,result[mh-1],vector[mh-1],this.mtx[mh-1][mh-1]);
 
     for (var i = mh-2; i >= 0; i--) {
-        //console.log(result);
         var sum = 0;
         for (var j = i+1; j &lt; mh; j++) {
             sum += this.mtx[i][j] * result[j];
         }
         result[i] = trunc((vector[i] - sum)/trunc(this.mtx[i][i]));
-        //console.log(result[i],'=',this.mtx[i][i],'->',vector[i],'-',sum,'/',
-        //        trunc(this.mtx[i][i]));
     }
     return result;
 };
@@ -340,13 +430,13 @@ Matrix.prototype.backwardSubstitution = function (vector) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Externals</h3><ul><li><a href="external-Array.html">Array</a></li></ul><h3>Classes</h3><ul><li><a href="Bridge.html">Bridge</a></li><li><a href="Gelenk.html">Gelenk</a></li><li><a href="Lager.html">Lager</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Stab.html">Stab</a></li></ul><h3>Global</h3><ul><li><a href="global.html#init">init</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Externals</h3><ul><li><a href="external-Array.html">Array</a></li></ul><h3>Classes</h3><ul><li><a href="Bridge.html">Bridge</a></li><li><a href="Gelenk.html">Gelenk</a></li><li><a href="Lager.html">Lager</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Stab.html">Stab</a></li></ul><h3>Global</h3><ul><li><a href="global.html#init">init</a></li><li><a href="global.html#mainLes">mainLes</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Sep 01 2014 16:12:26 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Sep 01 2014 23:03:47 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
