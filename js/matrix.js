@@ -328,8 +328,10 @@ Matrix.prototype.lr = function() {
  */
 Matrix.prototype.det = function() {
     'use strict';
-    //try { this.lr(); } catch(e) { return 0;    }
-    lr = this.lr();
+    var lr = 0;
+    try { lr = this.lr(); } catch(e) { lr = 0; }
+    if (lr === 0) { return 0; } // Singular matrix
+
     var r = lr.r;
     var det = 1;
     for (var i = 0; i < this.width; i++) {
