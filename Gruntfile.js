@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     meta: {
       src: 'js/*.js',
       specs: 'test/specs/*Spec.js',
-      helpers: 'test/helpers/*Helper.js'.
+      helpers: 'test/helpers/*Helper.js',
       fixtures: 'test/fixtures/*Helper.js'
     },
     uglify: {
