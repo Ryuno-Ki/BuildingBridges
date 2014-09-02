@@ -28,6 +28,7 @@ function init() {
     var gravity        = document.getElementById('gravis');
     var isMobileDevice = navigator.userAgent.match(/ipad|iphone|ipod|android/i);
 
+    console.log("Canvas",canvas);
     if (isMobileDevice) {
         gelenkBtn.addEventListener('mousedown', addCoordinates, false);
         canvas.addEventListener('mousedown', getPosition, false);
