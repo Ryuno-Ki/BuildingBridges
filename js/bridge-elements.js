@@ -394,7 +394,7 @@ Lager.prototype = new Gelenk();
  * @todo Check, whether this is really necessary
  */
 Lager.prototype.constructor = Lager;
-//Lager.prototype.getMass  = function() { return this._mass; };
-//Lager.prototype.setMass  = function(mass){ this._mass = mass; };
-//Lager.prototype.getPos  = function() { return this._pos; };
-//Lager.prototype.setPos  = function(pos){ this._pos = pos; };
+Lager.prototype.getMass  = function() { return this._mass; };
+Lager.prototype.setMass  = function(mass){ this._mass = mass; };
+Lager.prototype.getPos  = function() { return this._pos; };
+Lager.prototype.setPos  = function(pos){ this._pos = pos; };
