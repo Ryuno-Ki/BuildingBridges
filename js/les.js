@@ -6,7 +6,6 @@ function mainLes() {
     'use strict';
     var prepare = buildLes();
     var elasticity = document.getElementById('elasticity').value;
-    /*
     var matrix = prepare.matrix.mult(prepare.lengths).mult(prepare.matrix.transpose()).mult(elasticity);
     var shift = solveLes(matrix, prepare.rightHand);
     // TODO: Idea: adopt b.lager, b.staebe[n].leftEnd and .rightEnd
@@ -23,14 +22,13 @@ function mainLes() {
     }
     produceXml(b);
     updateCanvas('#FF0000');
-    */
 }
 
 function buildLes() {
 	'use strict';
 
 	var gravity   = document.getElementById('gravity').value;
-	var matrix    = new Matrix.fill(18,16,0);
+	var matrix    = new Matrix.fill(16,18,0);
 	var lengths   = new Array(b.stab.length);
 	var rightHand = new Array(16);
 	var stab      = b.stab;
