@@ -100,6 +100,7 @@ module.exports = function(grunt) {
   // Default task(s).
   grunt.registerTask('default', ['jshint','uglify','watch']);
   grunt.registerTask('dev', ['notify_hooks','watch']);
+  grunt.registerTask('doc', ['jsdoc']);
   grunt.registerTask('test', ['jshint', 'jasmine']);
   grunt.registerTask('test:coverage', ['jasmine:coverage']);
 };
