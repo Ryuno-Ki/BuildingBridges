@@ -1,8 +1,0 @@
-digraph userJourney
-{
-	PageLoaded -> FileUpload;
-	PageLoaded -> UserInput;
-	FileUpload -> defaultXml;
-	defaultXml -> Calculate;
-	Calculate   -> Rendered;
-}
