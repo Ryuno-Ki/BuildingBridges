@@ -2,6 +2,8 @@
 
 This project was developed in the context of a computer practical at university.
 
+**This project is deprecated and may contain potential security vulnerabilities! You have been warned**
+
 ## Getting started
 
 You'll need NodeJS (I've used v0.10.31 on a 64bit Debian) and Grunt-Cli (v0.1.13 here) in order to comprehend this project.
