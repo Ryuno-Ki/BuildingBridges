@@ -1,8 +1,8 @@
+**This project is archived and won't receive any updates!**
+
 # Building Bridges
 
 This project was developed in the context of a computer practical at university.
-
-**This project is deprecated and may contain potential security vulnerabilities! You have been warned**
 
 ## Getting started
 
